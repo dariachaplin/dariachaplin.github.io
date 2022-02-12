@@ -37,6 +37,14 @@ class RGB {
 
         return new HSV(h, s, v);
     }
+
+    toYIQ() {
+        let y = 0.299 * this.r + 0.587 * this.g + 0.114 * this.b;
+        let i = 0.596 * this.r + -0.275 * this.g + -0.321 * this.b;
+        let q = 0.212 * this.r + -0.523 * this.g + 0.311 * this.b;
+
+        return new YIQ(y, i, q);
+    }
 }
 
 class HSV {
@@ -95,6 +103,22 @@ class HSV {
                 b = q;
                 break;
         }
+
+        return new RGB(r, g, b);
+    }
+}
+
+class YIQ {
+    constructor(y, i, q) {
+        this.y = y;
+        this.i = i;
+        this.q = q;
+    }
+
+    toRGB() {
+        let r = 1.0 * this.y + 0.956 * this.i + 0.621 * this.q;
+        let g = 1.0 * this.y + -0.272 * this.i + -0.647 * this.q;
+        let b = 1.0 * this.y + -1.105 * this.i + 1.702 * this.q;
 
         return new RGB(r, g, b);
     }

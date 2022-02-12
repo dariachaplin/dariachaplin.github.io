@@ -1,5 +1,6 @@
 let rgb = new RGB(0, 0, 0);
 let hsv = new HSV(0, 0, 0);
+let yiq = new YIQ(0, 0, 0);
 
 function setup() {
     createCanvas(400, 400);
@@ -23,11 +24,11 @@ function setup() {
         rgbUpdate();
     });
 
-    // Temporary code - just for testing RGB/HSV conversion
-    hsv.h = 167;
-    hsv.s = 0.94;
-    hsv.v = 0.81;
-    rgb = hsv.toRGB();
+    // Temporary code - just for testing RGB/YIQ conversion
+    yiq.y = 0.51;
+    yiq.i = 0.01;
+    yiq.q = -0.18;
+    rgb = yiq.toRGB();
     rgbUpdate();
 
     noLoop();
