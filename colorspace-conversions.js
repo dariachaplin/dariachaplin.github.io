@@ -45,6 +45,14 @@ class RGB {
 
         return new YIQ(y, i, q);
     }
+
+    toXYZ() {
+        let x = 0.412453 * this.r + 0.357580 * this.g + 0.180423 * this.b;
+        let y = 0.212671 * this.r + 0.715160 * this.g + 0.072169 * this.b;
+        let z = 0.019334 * this.r + 0.119193 * this.g + 0.950227 * this.b;
+
+        return new XYZ(x, y, z);
+    }
 }
 
 class HSV {
@@ -121,5 +129,77 @@ class YIQ {
         let b = 1.0 * this.y + -1.105 * this.i + 1.702 * this.q;
 
         return new RGB(r, g, b);
+    }
+}
+
+class XYZ {
+    constructor(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    toRGB() {
+        let r = 3.240479 * this.x + -1.537150 * this.y + -0.498535 * this.z;
+        let g = -0.969256 * this.x + 1.875992 * this.y + 0.041556 * this.z;
+        let b = 0.055648 * this.x + -0.204043 * this.y + 1.057311 * this.z;
+
+        return new RGB(r, g, b);
+    }
+
+    f(t) {
+        if(t > 0.008856) {
+            return Math.pow(t, 1/3);
+        } else {
+            return 7.787 * t + 16.0 / 116.0;
+        }
+    }
+
+    toLAB() {
+        // Using D65 white point, xn = 95.047, yn = 100, zn = 108.883
+        // Source (for now): https://en.wikipedia.org/wiki/Illuminant_D65
+        let xn = 95.047;
+        let yn = 100.0;
+        let zn = 108.883;
+
+        let l, a, b;
+        if(this.y / yn > 0.008856) {
+            l = 116 * Math.pow((this.y / yn), 1/3) - 16;
+        } else {
+            l = 903.3 * this.y / yn;
+        }
+
+        a = 500 * (f(this.x / xn) - f(this.y / yn));
+        b = 200 * (f(this.y / yn) - f(this.z / zn));
+
+        return new LAB(l, a, b);
+    }
+}
+
+class LAB {
+    constructor(l, a, b) {
+        this.l = l;
+        this.a = a;
+        this.b = b;
+    }
+
+    toXYZ() {
+        // Using D65 white point, xn = 95.047, yn = 100, zn = 108.883
+        // Source (for now): https://en.wikipedia.org/wiki/Illuminant_D65
+        let xn = 95.047;
+        let yn = 100.0;
+        let zn = 108.883;
+
+        let p = (this.l + 16) / 116.0;
+        let x = xn * Math.pow((p + this.a / 500.0), 3);
+        let y = yn * Math.pow(p, 3);
+        let z = zn * Math.pow((p - this.b / 200.0), 3)
+
+        // This calculation only works for y / yn < 0.008856
+        if(y / yn > 0.008856) {
+            return new XYZ(x, y, z);
+        } else {
+            return -1;
+        }
     }
 }

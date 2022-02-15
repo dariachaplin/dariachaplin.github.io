@@ -1,6 +1,7 @@
 let rgb = new RGB(0, 0, 0);
 let hsv = new HSV(0, 0, 0);
 let yiq = new YIQ(0, 0, 0);
+let lab = new LAB(0, 0, 0);
 
 function setup() {
     createCanvas(400, 400);
@@ -24,12 +25,25 @@ function setup() {
         rgbUpdate();
     });
 
-    // Temporary code - just for testing RGB/YIQ conversion
-    yiq.y = 0.51;
-    yiq.i = 0.01;
-    yiq.q = -0.18;
-    rgb = yiq.toRGB();
+    // Temporary code - just for testing conversion functions
+    lab.l = 78.94;
+    lab.a = -33.16;
+    lab.b = 34.98;
+    xyz = lab.toXYZ();
+    console.log(xyz.x);
+    console.log(xyz.y);
+    console.log(xyz.z);
+    rgb = xyz.toRGB();
+    console.log(rgb.r);
+    console.log(rgb.g);
+    console.log(rgb.b);
     rgbUpdate();
+
+    rgb = new RGB(105, 160, 48);
+    xyz = rgb.toXYZ();
+    console.log(xyz.x);
+    console.log(xyz.y);
+    console.log(xyz.z);
 
     noLoop();
 }
