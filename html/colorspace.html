@@ -1,19 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Color Space Conversion</title>
 
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../css/colorspace.css">
 
     <script src="../libraries/p5.min.js"></script>
     <script src="../libraries/p5.sound.min.js"></script>
   </head>
 
   <body>
-    <script src="../scripts/colorspace-conversions.js"></script>
-    <script src="../scripts/colorspace.js"></script>
+    <h1>Color Space Conversion</h1>
+    <section class="container">
+      <div class="left"> 
+        <script src="../scripts/colorspace-conversions.js"></script>
+        <script src="../scripts/colorspace.js"></script>
+      </div>
+      <div class="right">
+        <div class="tab">
+          <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
+          <button class="tablinks" onclick="openTab(event, 'Color Space Models')">Color Space Models</button>
+          <button class="tablinks" onclick="openTab(event, 'Resources')">Resources</button>
+        </div>
+
+        <div id="Instructions" class="tabcontent">
+          <p>Each row of sliders on the left represents one color space. Adjust the displayed color with the sliders.</p>
+          <p>RGB: This is the standard color space for computers, and creates color by combining red, green, and blue.</p>
+          <p>HSV: Hue represents what we might consider the base color, saturation is the purity of the color 
+            (lower is closer to gray), and value is the brightness.</p>
+          <p>YIQ: Y represents the perceived luminance - black and white TVs only use the Y value in a YIQ color. I 
+            and Q represent the chrominance, which the color component. I controls the orange-blue range, and Q 
+            controls the purple-green range.</p>
+        </div>
+        <div id="Color Space Models" class="tabcontent">
+          <p>
+            Each color space is also associated with a model, a physical representation of its components. Below is a 
+            screenshot of the RGB, HSV, YIQ, and CIE LAB color space models.
+          </p>
+          <img src="../images/color-space-models.png" alt="Color Models">
+        </div>
+        <div id="Resources" class="tabcontent">
+          <p>
+            <a href="https://programmingdesignsystems.com/color/color-models-and-color-spaces/index.html">
+              Color Models and Color Spaces
+            </a>
+            : This article introduces color models, spaces, and profiles, and explains RGB and HSV. It also discusses 
+            HSL, a version of HSV that replaces 'value' with 'lightness'.
+          </p>
+          <p>
+            <a href="https://culorijs.org/color-spaces/">
+              Culori - Color Spaces
+            </a>
+            : Many color spaces are described in this listing, including some helpful details about YIQ. The website 
+            itself documents Culori, a JavaScript library for color.
+          </p>
+          <p>
+            <a href="http://www.huevaluechroma.com/">
+              The Dimensions of Colour
+            </a>
+            : This links to an in-depth online resource by David Briggs. This lays out many of the properties 
+            and principles of color: additive/subtractive mixing, lightness and chrome, brightness and 
+            saturation, etc.
+          </p>
+          <p>
+            <a href="https://sites.google.com/site/djcbriggs/colour-online">
+              Colour Online
+            </a>
+            : David Briggs also links to this large and well-organized collection of further links
+            to other color resources.
+          </p>
+        </div>
+      </div>
+    </section>
   </body>
+  
 </html>
