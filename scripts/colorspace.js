@@ -109,9 +109,6 @@ function yiqValUpdate() {
 }
 
 function rgbSliderUpdate() {
-    console.log(rgb.r);
-    console.log(rgb.g);
-    console.log(rgb.b);
     sliderR.value(rgb.r * 255);
     sliderG.value(rgb.g * 255);
     sliderB.value(rgb.b * 255);
