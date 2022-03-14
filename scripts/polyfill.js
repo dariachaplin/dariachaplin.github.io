@@ -2,11 +2,11 @@ function setup() {
     createCanvas(400, 400);
     background('red');
 
-    // vtxs = [new Vertex(100, 100), new Vertex(100, 200),
-    //     new Vertex(200, 200), new Vertex(200, 100)];
+    vtxs = [new Vertex(100, 100), new Vertex(100, 200), new Vertex(300, 200), new Vertex(200, 170)];
+    // vtxs = [new Vertex(40, 40), new Vertex(0, 40), new Vertex(35, 10), new Vertex(20, 60), new Vertex(5, 10)]
     
-    vtxs = [new Vertex(2, 3), new Vertex(7, 1), new Vertex(13, 5),
-        new Vertex(13, 11), new Vertex(7, 7), new Vertex(2, 9)];
+    // This doesn't work right, might need to adjust coords tho
+    // vtxs = [new Vertex(20, 30), new Vertex(70, 10), new Vertex(130, 50), new Vertex(130, 110), new Vertex(70, 70), new Vertex(20, 90)];
 
     polyfill(vtxs);
 
@@ -93,7 +93,12 @@ function sortActiveList(activeList) {
     return activeList;
 }
 
-function polyfill(v) {
+// TODO
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function polyfill(v) {
     // Set up edge table and active list
     let edgeTable = createEdgeTable(v);
     let activeList = [];
@@ -115,10 +120,6 @@ function polyfill(v) {
             upperY = (localMax > upperY) ? localMax : upperY;
         }
     }
-
-    console.log(edgeTable);
-    console.log(lowerY);
-    console.log(upperY);
     
     let y = (lowerY >= -1) ? lowerY : 0;
 
@@ -143,21 +144,16 @@ function polyfill(v) {
         // Sort active list on x (or by 1/m for those with matching x)
         if(activeList.length > 0) { activeList = sortActiveList(activeList); }
 
-        console.log(activeList);
-
         // Fill pixels on scan line y using pairs of x coords from active list
         let x1, x2;
         for(let i = 0; i < activeList.length - 1; i += 2) {
             x1 = ceil(activeList[i].x);
             x2 = floor(activeList[i + 1].x);
-            console.log(activeList[i].x);
-            console.log(activeList[i + 1].x);
             for(let j = x1; j < x2; j++) {
-                // TODO: fill pixel at (j, y)
-                console.log("point " + j + " " + y);
                 stroke(0, 0, 0);
                 point(j, y);
             }
+            await sleep(300);
         }
 
         // Increment y and update x values in active list
@@ -165,7 +161,7 @@ function polyfill(v) {
         for(let i = 0; i < activeList.length; i++) {
             // Can skip over vertical edges
             if(activeList[i].invSlope != 0) {
-                activeList[i].x += activeList[i].invSlope;
+                activeList[i].x += activeList[i].slopeInv;
             }
         }
     }
