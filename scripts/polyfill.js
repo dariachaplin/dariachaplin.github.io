@@ -1,27 +1,48 @@
 function setup() {
     createCanvas(400, 400);
     background(153, 189, 255);
+    let vtxs;
 
-    // Custom shape
-    vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120), new Vertex(250, 200),
-        new Vertex(230, 200), new Vertex(200, 300), new Vertex(200, 300),
-        new Vertex(170, 200), new Vertex(150, 200), new Vertex(110, 120)];
-    
-    // Class slides example
+    // Class slides example - scale up for use ?
     // vtxs = [new Vertex(20, 30), new Vertex(70, 10), new Vertex(130, 50), new Vertex(130, 110), new Vertex(70, 70), new Vertex(20, 90)];
 
-    // Star shape
-    // vtxs = [new Vertex(100, 33), new Vertex(200, 108), new Vertex(300, 33),
-    //     new Vertex(263, 156), new Vertex(366, 233), new Vertex(240, 233),
-    //     new Vertex(200, 366), new Vertex(160, 233), new Vertex(33, 233),
-    //     new Vertex(136, 156)];
+    // Custom shape, simple for this algo
+    b1 = createButton('Shape 1');
+    b1.position(10, 487);
+    b1.mousePressed(() => {
+        // Custom shape
+        vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120), new Vertex(250, 200),
+            new Vertex(230, 200), new Vertex(200, 300), new Vertex(200, 300),
+            new Vertex(170, 200), new Vertex(150, 200), new Vertex(110, 120)];
+        clear();
+        background(153, 189, 255);
+        polyfill(vtxs);
+    });
 
     // 4-pointed star
-    // vtxs = [new Vertex(100, 100), new Vertex(200, 150), new Vertex(300, 100),
-    //     new Vertex(250, 200), new Vertex(300, 300), new Vertex(200, 250),
-    //     new Vertex(100, 300), new Vertex(150, 200)];
+    b2 = createButton('Shape 2');
+    b2.position(85, 487);
+    b2.mousePressed(() => {
+        vtxs = [new Vertex(100, 100), new Vertex(200, 150), new Vertex(300, 100),
+            new Vertex(250, 200), new Vertex(300, 300), new Vertex(200, 250),
+            new Vertex(100, 300), new Vertex(150, 200)];
+        clear();
+        background(153, 189, 255);
+        polyfill(vtxs);
+    });
 
-    polyfill(vtxs);
+    // Star shape
+    b3 = createButton('Shape 3');
+    b3.position(160, 487);
+    b3.mousePressed(() => {
+        vtxs = [new Vertex(100, 33), new Vertex(200, 108), new Vertex(300, 33),
+            new Vertex(263, 156), new Vertex(366, 233), new Vertex(240, 233),
+            new Vertex(200, 366), new Vertex(160, 233), new Vertex(33, 233),
+            new Vertex(136, 156)];
+        clear();
+        background(153, 189, 255);
+        polyfill(vtxs);
+    });
 
     noLoop();
 }
@@ -200,7 +221,7 @@ async function polyfill(v) {
                 stroke(0, 0, 0);
                 point(j, 400 - y); // Swap the y value to account for 
             }
-            await sleep(300); // TODO remove after temporary use
+            // await sleep(300); // TODO remove after debugging/temp use
         }
 
         // Increment y and update x values in active list
