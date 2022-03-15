@@ -1,12 +1,25 @@
 function setup() {
     createCanvas(400, 400);
-    background('red');
+    background(153, 189, 255);
 
-    vtxs = [new Vertex(100, 100), new Vertex(100, 200), new Vertex(300, 200), new Vertex(200, 170)];
-    // vtxs = [new Vertex(40, 40), new Vertex(0, 40), new Vertex(35, 10), new Vertex(20, 60), new Vertex(5, 10)]
+    // Custom shape
+    vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120), new Vertex(250, 200),
+        new Vertex(230, 200), new Vertex(200, 300), new Vertex(200, 300),
+        new Vertex(170, 200), new Vertex(150, 200), new Vertex(110, 120)];
     
-    // This doesn't work right, might need to adjust coords tho
+    // Class slides example
     // vtxs = [new Vertex(20, 30), new Vertex(70, 10), new Vertex(130, 50), new Vertex(130, 110), new Vertex(70, 70), new Vertex(20, 90)];
+
+    // Star shape
+    // vtxs = [new Vertex(100, 33), new Vertex(200, 108), new Vertex(300, 33),
+    //     new Vertex(263, 156), new Vertex(366, 233), new Vertex(240, 233),
+    //     new Vertex(200, 366), new Vertex(160, 233), new Vertex(33, 233),
+    //     new Vertex(136, 156)];
+
+    // 4-pointed star
+    // vtxs = [new Vertex(100, 100), new Vertex(200, 150), new Vertex(300, 100),
+    //     new Vertex(250, 200), new Vertex(300, 300), new Vertex(200, 250),
+    //     new Vertex(100, 300), new Vertex(150, 200)];
 
     polyfill(vtxs);
 
@@ -93,15 +106,45 @@ function sortActiveList(activeList) {
     return activeList;
 }
 
-// TODO
+// TODO - temporary function to simulate step-by-step nature
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// TODO - improve formatting, document
+function updateActiveList(activeList) {
+    let element = document.getElementById('Active List');
+    element.innerHTML = "<u>Y Max, X, 1/m</u>";
+
+    for(let i = 0; i < activeList.length; i++) {
+        let edge = activeList[i];
+        element.innerHTML += "<p>" + +edge.yMax.toFixed(3) + ", " 
+            + +edge.x.toFixed(3) + ", " + +edge.slopeInv.toFixed(3) + "</p>";
+    }
+}
+
+// TODO - improve formatting, document
+function updateEdgeTable(edgeTable) {
+    let element = document.getElementById('Edge Table');
+    element.innerHTML = "";
+    let keys = Array.from(edgeTable.keys()).sort(function(a,b) {return a - b;});
+
+    for(let i = 0; i < keys.length; i++) {
+        element.innerHTML += "<u>" + keys[i] + "</u>:";
+        let buckets = edgeTable.get(keys[i]);
+        for(let j = 0; j < buckets.length; j++) {
+            let edge = buckets[j];
+            element.innerHTML += "<p>" + +edge.yMax.toFixed(3) + ", " 
+            + +edge.x.toFixed(3) + ", " + +edge.slopeInv.toFixed(3) + "</p>";
+        }
+    }
 }
 
 async function polyfill(v) {
     // Set up edge table and active list
     let edgeTable = createEdgeTable(v);
     let activeList = [];
+    updateEdgeTable(edgeTable);
 
     // Find min and max y-values of edge table
     let lowerY = -1, upperY = 0;
@@ -127,10 +170,11 @@ async function polyfill(v) {
     while(y <= upperY) {
         // Discard entries where yMax == y (edge has been completed)
         for(let i = 0; i < activeList.length; i++) {
-            if(activeList[i].yMax == y) {
+            if(activeList[i].yMax <= y) {
                 activeList.splice(i, 1);
             }
         }
+        updateActiveList(activeList);
 
         // Move all buckets from the current edge table to active list
         if(edgeTable.has(y)) {
@@ -139,10 +183,13 @@ async function polyfill(v) {
                 // TODO better way to do this ?
                 activeList.push(edges[i]);
             }
+            edgeTable.delete(y);
+            updateEdgeTable(edgeTable);
         }
 
         // Sort active list on x (or by 1/m for those with matching x)
         if(activeList.length > 0) { activeList = sortActiveList(activeList); }
+        updateActiveList(activeList);
 
         // Fill pixels on scan line y using pairs of x coords from active list
         let x1, x2;
@@ -151,9 +198,9 @@ async function polyfill(v) {
             x2 = floor(activeList[i + 1].x);
             for(let j = x1; j < x2; j++) {
                 stroke(0, 0, 0);
-                point(j, y);
+                point(j, 400 - y); // Swap the y value to account for 
             }
-            await sleep(300);
+            await sleep(300); // TODO remove after temporary use
         }
 
         // Increment y and update x values in active list
@@ -164,5 +211,6 @@ async function polyfill(v) {
                 activeList[i].x += activeList[i].slopeInv;
             }
         }
+        updateActiveList(activeList);
     }
 }
