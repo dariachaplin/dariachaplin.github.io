@@ -10,6 +10,22 @@
     left: 450px;
 }
 
+/* Image grid system */
+.img-container {
+    display: flex;
+}
+
+.img-child {
+    flex: 1;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
+}
+
 /* Style the tab */
 .tab {
     overflow: hidden;
