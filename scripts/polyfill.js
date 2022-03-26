@@ -1,3 +1,7 @@
+// Global values to control flow of polygon fill algorithm
+let clearAT = false, updateAT = false, sortAT = false,
+    incScanLine = false, updateXvals = false;
+
 function setup() {
     createCanvas(400, 400);
     background(153, 189, 255);
@@ -11,9 +15,10 @@ function setup() {
     b1.position(10, 487);
     b1.mousePressed(() => {
         // Custom shape
-        vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120), new Vertex(250, 200),
-            new Vertex(230, 200), new Vertex(200, 300), new Vertex(200, 300),
-            new Vertex(170, 200), new Vertex(150, 200), new Vertex(110, 120)];
+        vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120),
+            new Vertex(250, 200), new Vertex(230, 200), new Vertex(200, 300),
+            new Vertex(200, 300), new Vertex(170, 200), new Vertex(150, 200),
+            new Vertex(110, 120)];
         clear();
         background(153, 189, 255);
         polyfill(vtxs);
@@ -42,6 +47,40 @@ function setup() {
         clear();
         background(153, 189, 255);
         polyfill(vtxs);
+    });
+
+    // Buttons to control flow of algorithm
+    // Always check if the previous button has been selected
+    //      in order to enforce the order of flow
+
+    b4 = createButton('Increment Scan Line');
+    b4.position(10, 520);
+    b4.mousePressed(() => {
+        if(sortAT) { incScanLine = true; }
+    });
+    
+    b5 = createButton('Update X');
+    b5.position(10, 544);
+    b5.mousePressed(() => {
+        if(incScanLine) { updateXvals = true; }
+    });
+
+    b6 = createButton('Remove Edges');
+    b6.position(85, 544);
+    b6.mousePressed(() => {
+        clearAT = true;
+    });
+
+    b7 = createButton('Add Edges');
+    b7.position(195, 544);
+    b7.mousePressed(() => {
+        if(clearAT) { updateAT = true; }
+    });
+
+    b8 = createButton('Reorder');
+    b8.position(279, 544);
+    b8.mousePressed(() => {
+        if(updateAT) { sortAT = true; }
     });
 
     noLoop();
@@ -127,7 +166,7 @@ function sortActiveList(activeList) {
     return activeList;
 }
 
-// TODO - temporary function to simulate step-by-step nature
+// Sleep function used to wait for user input on control flow buttons
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -190,6 +229,7 @@ async function polyfill(v) {
     // Iterate through the lowest to highest relevant scan lines
     while(y <= upperY) {
         // Discard entries where yMax == y (edge has been completed)
+        while(!clearAT) { await sleep(300); }
         for(let i = 0; i < activeList.length; i++) {
             if(activeList[i].yMax <= y) {
                 activeList.splice(i, 1);
@@ -198,6 +238,7 @@ async function polyfill(v) {
         updateActiveList(activeList);
 
         // Move all buckets from the current edge table to active list
+        while(!updateAT) { await sleep(300); }
         if(edgeTable.has(y)) {
             let edges = edgeTable.get(y);
             for(let i = 0; i < edges.length; i++) {
@@ -209,6 +250,7 @@ async function polyfill(v) {
         }
 
         // Sort active list on x (or by 1/m for those with matching x)
+        while(!sortAT) { await sleep(300); }
         if(activeList.length > 0) { activeList = sortActiveList(activeList); }
         updateActiveList(activeList);
 
@@ -219,13 +261,14 @@ async function polyfill(v) {
             x2 = floor(activeList[i + 1].x);
             for(let j = x1; j < x2; j++) {
                 stroke(0, 0, 0);
-                point(j, 400 - y); // Swap the y value to account for 
+                point(j, 400 - y); // Adjust y-value for p5 canvas
             }
-            // await sleep(300); // TODO remove after debugging/temp use
         }
 
         // Increment y and update x values in active list
+        while(!incScanLine) { await sleep(300); }
         y++;
+        while(!updateXvals) { await sleep(300); }
         for(let i = 0; i < activeList.length; i++) {
             // Can skip over vertical edges
             if(activeList[i].invSlope != 0) {
@@ -233,5 +276,9 @@ async function polyfill(v) {
             }
         }
         updateActiveList(activeList);
+
+        // Reset the control flow variables
+        clearAT = false, updateAT = false, sortAT = false, 
+            incScanLine = false, updateXvals = false;
     }
 }
