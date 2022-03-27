@@ -6,13 +6,69 @@
 
     <title>Transformation Game</title>
 
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../css/pagestyle.css">
 
     <script src="../libraries/p5.min.js"></script>
     <script src="../libraries/p5.sound.min.js"></script>
   </head>
 
   <body>
-    <script src="../scripts/transformation.js"></script>
+    <h1>Transformation Game</h1>
+    <section class="container">
+      <div class="left">
+        <script src="../scripts/utility-funcs.js"></script>
+        <script src="../scripts/transformation.js"></script>
+      </div>
+      <div class="right">
+        <div class="tab">
+          <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
+          <button class="tablinks" onclick="openTab(event, 'Resources')">Resources</button>
+        </div>
+
+        <div id="Instructions" class="tabcontent">
+          <p>This tool is based on 
+            <a href="http://cs.brown.edu/exploratory/freeSoftware/repository/edu/brown/cs/exploratories/applets/transformationGame/transformation_game_guide.html">
+              Brown University's Transformation Game</a>, an applet created to demonstrate how 2D transformations are 
+              chained together.
+          </p>
+          <p>
+            The goal is to line up the house at the origin with the grayscale target house by using basic transformations: 
+            translating, rotating, and scaling. 
+          </p>
+          <p>
+            TODO - specific info about the user experience
+          </p>
+        </div>
+        <div id="Resources" class="tabcontent">
+          <p>
+            <a href="https://math.hws.edu/graphicsbook/c2/s3.html">
+              Introduction to Computer Graphics: Transforms
+            </a>
+            : Professor David J. Eck published a free online textbook about computer graphics, and this section on transformations
+            is a great introduction to the basic transformations as well as their uses in the context of graphics.
+          </p>
+          <p>
+            <a href="https://www.tutorialspoint.com/computer_graphics/2d_transformation.htm">
+              Tutorials Point - 2D Transformation
+            </a>
+            : This article provides a concise explanation of the basic transformations and their associated matrices, and also 
+            covers reflection and shear transforms.
+          </p>
+          <p>
+            <a href="https://www.ck12.org/book/ck-12-geometry-concepts-honors/section/2.10/">
+              CK-12 - Composite Transformations
+            </a>
+            : While this article is geared towards geometry students, it describes the concepts of composite transformations 
+            and has helpful examples of how order matters.
+          </p>
+          <p>
+            <a href="https://www.tutorialspoint.com/computer_graphics/3d_transformation.htm">
+              Tutorials Point - 3D Transformation
+            </a>
+            : As an extra, this article discusses 3D transformations and how they are different from 2D, especially rotations.
+          </p>
+        </div>
+      </div>
+    </section>
   </body>
 </html>
