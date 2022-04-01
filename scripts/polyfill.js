@@ -1,10 +1,29 @@
 // Global values to control flow of polygon fill algorithm
 let clearAT = false, updateAT = false, sortAT = false,
-    incScanLine = false, updateXvals = false;
+    incScanLine = false, updateXvals = false, autoplay = false;
+
+function resetFlowVars() {
+    clearAT = false;
+    updateAT = false;
+    sortAT = false;
+    incScanLine = false;
+    updateXvals = false;
+    autoplay = false;
+}
+
+// Set background and draw a grid
+function drawGrid() {
+    background(153, 189, 255);
+    for(let i = 0; i < 400; i += 10) {
+        stroke('white');
+        line(i, 0, i, 400);
+        line(0, i, 400, i);
+    }
+}
 
 function setup() {
     createCanvas(400, 400);
-    background(153, 189, 255);
+    drawGrid();
     let vtxs;
 
     // Class slides example - scale up for use ?
@@ -15,12 +34,14 @@ function setup() {
     b1.position(10, 487);
     b1.mousePressed(() => {
         // Custom shape
+        // vtxs = [new Vertex(2, 3), new Vertex(7, 1), new Vertex(13, 5), new Vertex(13, 11), new Vertex(7, 7), new Vertex(2, 9)];
         vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120),
             new Vertex(250, 200), new Vertex(230, 200), new Vertex(200, 300),
             new Vertex(200, 300), new Vertex(170, 200), new Vertex(150, 200),
             new Vertex(110, 120)];
         clear();
-        background(153, 189, 255);
+        drawGrid();
+        resetFlowVars();
         polyfill(vtxs);
     });
 
@@ -32,7 +53,8 @@ function setup() {
             new Vertex(250, 200), new Vertex(300, 300), new Vertex(200, 250),
             new Vertex(100, 300), new Vertex(150, 200)];
         clear();
-        background(153, 189, 255);
+        drawGrid();
+        resetFlowVars();
         polyfill(vtxs);
     });
 
@@ -45,7 +67,8 @@ function setup() {
             new Vertex(200, 366), new Vertex(160, 233), new Vertex(33, 233),
             new Vertex(136, 156)];
         clear();
-        background(153, 189, 255);
+        drawGrid();
+        resetFlowVars();
         polyfill(vtxs);
     });
 
@@ -83,6 +106,17 @@ function setup() {
         if(updateAT) { sortAT = true; }
     });
 
+    b9 = createButton('Complete Shape');
+    b9.position(10, 577);
+    b9.mousePressed(() => {
+        autoplay = true;
+        clearAT = true;
+        updateAT = true;
+        sortAT = true;
+        incScanLine = true;
+        updateXvals = true;
+    });
+
     noLoop();
 }
 
@@ -98,6 +132,23 @@ class EdgeBucket {
         this.yMax = yMax;           // the edge's large y-value
         this.x = x;                 // the current value of x
         this.slopeInv = slopeInv;   // 1/m value for edge
+    }
+}
+
+// Color in a 10x10 area of the grid, x and y are bottom left coordinate
+function colorBigPixel(x, y) {
+    // circle(x + 5, y + 5, 10);
+    // Round to nearest big pixel first
+    let x_extra = x % 10;
+    x = (x_extra < 5.0) ? x - x_extra : x + (10 - x_extra);
+    let y_extra = y % 10;
+    y = (y_extra < 5.0) ? y - y_extra : y + (10 - y_extra);
+
+    // Now draw
+    for(let i = x; i < x + 10; i++) {
+        for(let j = y; j < y + 10; j++) {
+            point(i, 400 - j); // Adjust y to work with p5 canvas
+        }
     }
 }
 
@@ -230,11 +281,13 @@ async function polyfill(v) {
     while(y <= upperY) {
         // Discard entries where yMax == y (edge has been completed)
         while(!clearAT) { await sleep(300); }
+        let activeListCopy = [];
         for(let i = 0; i < activeList.length; i++) {
-            if(activeList[i].yMax <= y) {
-                activeList.splice(i, 1);
+            if(activeList[i].yMax > y) {
+                activeListCopy.push(activeList[i]);
             }
         }
+        activeList = activeListCopy;
         updateActiveList(activeList);
 
         // Move all buckets from the current edge table to active list
@@ -260,25 +313,30 @@ async function polyfill(v) {
             x1 = ceil(activeList[i].x);
             x2 = floor(activeList[i + 1].x);
             for(let j = x1; j < x2; j++) {
-                stroke(0, 0, 0);
-                point(j, 400 - y); // Adjust y-value for p5 canvas
+                // Shape will be black and outlined in grey
+                if(j == x2 || j == x2 - 1) { stroke(100, 100, 100); }
+                else { stroke(0, 0, 0); }
+                colorBigPixel(j, y);
             }
         }
 
         // Increment y and update x values in active list
         while(!incScanLine) { await sleep(300); }
-        y++;
+        y += 10; // y++;
         while(!updateXvals) { await sleep(300); }
         for(let i = 0; i < activeList.length; i++) {
             // Can skip over vertical edges
             if(activeList[i].invSlope != 0) {
-                activeList[i].x += activeList[i].slopeInv;
+                activeList[i].x += 10 * activeList[i].slopeInv;
+                //activeList[i].x += activeList[i].slopeInv;
             }
         }
         updateActiveList(activeList);
 
-        // Reset the control flow variables
-        clearAT = false, updateAT = false, sortAT = false, 
-            incScanLine = false, updateXvals = false;
+        // Reset the control flow variables if not autoplaying
+        if(!autoplay) {
+            clearAT = false, updateAT = false, sortAT = false, 
+                incScanLine = false, updateXvals = false;
+        }
     }
 }
