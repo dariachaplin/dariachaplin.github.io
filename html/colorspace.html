@@ -11,6 +11,7 @@
 
     <script src="../libraries/p5.min.js"></script>
     <script src="../libraries/p5.sound.min.js"></script>
+    <script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
   </head>
 
   <body>
@@ -25,6 +26,7 @@
         <div class="tab">
           <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
           <button class="tablinks" onclick="openTab(event, 'Color Space Models')">Color Space Models</button>
+          <button class="tablinks" onclick="openTab(event, 'Make Your Own')">Make Your Own</button>
           <button class="tablinks" onclick="openTab(event, 'Resources')">Resources</button>
         </div>
 
@@ -56,6 +58,12 @@
               <img src="../images/yiq.PNG" alt="YIQ Model" class="center">
             </div>
           </div>
+        </div>
+        <div id="Make Your Own" class="tabcontent">
+          <p>
+            On this tab, you can input your own matrix to set up a custom color space. Check the option below to get started.
+          </p>
+          <!-- TODO -->
         </div>
         <div id="Resources" class="tabcontent">
           <p>

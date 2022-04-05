@@ -203,3 +203,35 @@ class LAB {
         }
     }
 }
+
+class CustomSpace {
+    // v1, v2, v3 are the color values
+    // Matrix to transform this to RGB is provided by 'mat' variables
+    constructor(v1, v2, v3, mat00, mat01, mat02, mat10, mat11, mat12,
+        mat20, mat21, mat22) {
+            this.v1 = v1;
+            this.v2 = v2;
+            this.v3 = v3;
+
+            this.mat = [[mat00, mat01, mat02],
+                        [mat10, mat11, mat12],
+                        [mat20, mat21, mat22]];
+
+            // Use math library to calculate inverse of given matrix
+            this.matInv = math.inv(this.mat);
+    }
+
+    toRGB() {
+        let r = this.mat[0][0] * this.v1 + this.mat[0][1] * this.v2 + this.mat[0][2] * this.v3;
+        let g = this.mat[1][0] * this.v1 + this.mat[1][1] * this.v2 + this.mat[1][2] * this.v3;
+        let b = this.mat[2][0] * this.v1 + this.mat[2][1] * this.v2 + this.mat[2][2] * this.v3;
+
+        return new RGB(r, g, b);
+    }
+
+    fromRGB(r, g, b) {
+        this.v1 = this.matInv[0][0] * r + this.matInv[0][1] * g + this.matInv[0][2] * b;
+        this.v2 = this.matInv[1][0] * r + this.matInv[1][1] * g + this.matInv[1][2] * b;
+        this.v3 = this.matInv[2][0] * r + this.matInv[2][1] * g + this.matInv[2][2] * b;
+    }
+}
