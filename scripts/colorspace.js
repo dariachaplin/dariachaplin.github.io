@@ -7,9 +7,9 @@ let sliderH, sliderS, sliderV;
 let yiq = new YIQ(0, 0, 0);
 let sliderY, sliderI, sliderQ;
 
-let custom = new CustomSpace(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+let custom = new CustomSpace(0, 0, 0, [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
 let sliderVal1, sliderVal2, sliderVal3;
-let displayCustomSpace = false;
+let customSpaceDisplayed = false;
 
 let height = 280;
 
@@ -64,7 +64,7 @@ function setup() {
     // Create sliders and labels for each color space
 
     // RGB
-    rgbSpace = new ColorSpace('Red', '0', '255', 'Green', '0', '255',
+    let rgbSpace = new ColorSpace('Red', '0', '255', 'Green', '0', '255',
         'Blue', '0', '255');
     sliderR = createSlider(0, 255);
     sliderG = createSlider(0, 255);
@@ -84,7 +84,7 @@ function setup() {
     });
 
     // HSV
-    hsvSpace = new ColorSpace('Hue', '0', '360', 'Saturation', '0', '100',
+    let hsvSpace = new ColorSpace('Hue', '0', '360', 'Saturation', '0', '100',
         'Value', '0', '100');
     sliderH = createSlider(0, 360);
     sliderS = createSlider(0, 100);
@@ -104,7 +104,7 @@ function setup() {
     });
 
     // YIQ
-    yiqSpace = new ColorSpace('Y', '0', '1', 'I', '-0.5226', '0.5226',
+    let yiqSpace = new ColorSpace('Y', '0', '1', 'I', '-0.5226', '0.5226',
         'Q', '-0.5957', '0.5957');
     sliderY = createSlider(0, 1, 0, 0);
     sliderI = createSlider(-0.5226, 0.5226, 0, 0);
@@ -124,11 +124,13 @@ function setup() {
     });
 
     // Custom
-    customSpace = new ColorSpace('Value 1', '0', '1', 'Value 2', '0', '1',
+    let customSpace = new ColorSpace('Value 1', '0', '1', 'Value 2', '0', '1',
         'Value 3', '0', '1');
     sliderVal1 = createSlider(0, 1, 0, 0);
     sliderVal2 = createSlider(0, 1, 0, 0);
     sliderVal3 = createSlider(0, 1, 0, 0);
+    // Note - if a new color space is added, it should be above this one
+    // Be sure to adjust height here and in the updateRanges function below
     createColorRow(height + 195, customSpace, sliderVal1, sliderVal2, sliderVal3);
     sliderVal1.input(() => {
         custom.v1 = sliderVal1.value();
@@ -142,6 +144,9 @@ function setup() {
         custom.v3 = sliderVal3.value();
         customValUpdate();
     });
+
+    // Hide the custom space by default, users can turn it on with checkbox
+    hideCustomSpace();
 
     // Set the initial color to orange
     rgb = new RGB(0.87, 0.45, 0.04);
@@ -165,6 +170,7 @@ function rgbValUpdate() {
 }
 
 function hsvValUpdate() {
+    hsvLabelUpdate();
     rgb = hsv.toRGB();
     rgbSliderUpdate();
     yiq = rgb.toYIQ();
@@ -175,6 +181,7 @@ function hsvValUpdate() {
 }
 
 function yiqValUpdate() {
+    yiqLabelUpdate();
     rgb = yiq.toRGB();
     rgbSliderUpdate();
     hsv = rgb.toHSV();
@@ -185,6 +192,7 @@ function yiqValUpdate() {
 }
 
 function customValUpdate() {
+    customLabelUpdate();
     rgb = custom.toRGB();
     rgbSliderUpdate();
     hsv = rgb.toHSV();
@@ -268,4 +276,147 @@ function customLabelUpdate() {
 
 // Functionality for displaying the custom color space
 
-// TODO
+function customSpaceVisibilityChange() {
+    let displayCustomSpaceCheckbox = document.getElementById('display-custom');
+    if(displayCustomSpaceCheckbox.checked) { showCustomSpace(); }
+    else { hideCustomSpace(); }
+}
+
+function inputIsNaNorWrong(vals, inputType) {
+    let error = false;
+
+    // Check for non-numbers and empty slots
+    vals.forEach(val => {
+        if(isNaN(val)) {
+            document.getElementById(inputType + '-error-msg').innerHTML = 
+                "Error: Please make sure you have entered numeric values in each slot.";
+            error = true;
+        }
+    });
+
+    // Check for invalid ranges (lower > upper)
+    if(inputType == 'ranges') {
+        for(let i = 0; i < vals.length; i += 2) {
+            if(vals[i] >= vals[i + 1]) {
+                document.getElementById('ranges-error-msg').innerHTML = 
+                    "Error: Ensure that each lower bound is less than its upper bound.";
+                error = true;
+            }
+        }
+    }
+
+    // Return true only if errors were found; if no errors, clear the error message
+    if(error) {
+        return true;
+    } else {
+        document.getElementById(inputType + '-error-msg').innerHTML = "";
+        return false;
+    }
+}
+
+function updateMatrix() {
+    // Gather latest matrix values
+    let mat00 = parseFloat(document.getElementById('mat00').value);
+    let mat01 = parseFloat(document.getElementById('mat01').value);
+    let mat02 = parseFloat(document.getElementById('mat02').value);
+    let mat10 = parseFloat(document.getElementById('mat10').value);
+    let mat11 = parseFloat(document.getElementById('mat11').value);
+    let mat12 = parseFloat(document.getElementById('mat12').value);
+    let mat20 = parseFloat(document.getElementById('mat20').value);
+    let mat21 = parseFloat(document.getElementById('mat21').value);
+    let mat22 = parseFloat(document.getElementById('mat22').value);
+
+    // If any of the values are not numbers, update error message and return
+    let vals = [mat00, mat01, mat02, mat10, mat11, mat12, mat20, mat21, mat22];
+    if(inputIsNaNorWrong(vals, 'matrix')) { return; }
+
+    // Update the matrix, refresh the custom color space's values based on current RGB
+    custom.mat = [[mat00, mat01, mat02], [mat10, mat11, mat12], [mat20, mat21, mat22]];
+    custom.fromRGB(rgb.r, rgb.g, rgb.b);
+    customSliderUpdate();
+}
+
+function updateRanges() {
+    // Gather latest range values
+    let lower1 = parseFloat(document.getElementById('range1-lower').value);
+    let upper1 = parseFloat(document.getElementById('range1-upper').value);
+    let lower2 = parseFloat(document.getElementById('range2-lower').value);
+    let upper2 = parseFloat(document.getElementById('range2-upper').value);
+    let lower3 = parseFloat(document.getElementById('range3-lower').value);
+    let upper3 = parseFloat(document.getElementById('range3-upper').value);
+
+    // If any of the values are not numbers, update error message and return
+    let vals = [lower1, upper1, lower2, upper2, lower3, upper3];
+    if(inputIsNaNorWrong(vals, 'ranges')) { return; }
+
+    // Remove the previous sliders and labels
+    sliderVal1.remove();
+    sliderVal2.remove();
+    sliderVal3.remove();
+    let labels = getCustomSpaceLabels();
+    labels.forEach(label => label.remove());
+
+    // Recreate the sliders and labels with the new range info
+    let customSpace = new ColorSpace('Value 1', String(lower1), String(upper1), 'Value 2',
+        String(lower2), String(upper2), 'Value 3', String(lower3), String(upper3));
+    sliderVal1 = createSlider(lower1, upper1, 0, 0);
+    sliderVal2 = createSlider(lower2, upper2, 0, 0);
+    sliderVal3 = createSlider(lower3, upper3, 0, 0);
+    createColorRow(height + 195, customSpace, sliderVal1, sliderVal2, sliderVal3);
+    sliderVal1.input(() => {
+        custom.v1 = sliderVal1.value();
+        customValUpdate();
+    });
+    sliderVal2.input(() => {
+        custom.v2 = sliderVal2.value();
+        customValUpdate();
+    });
+    sliderVal3.input(() => {
+        custom.v3 = sliderVal3.value();
+        customValUpdate();
+    });
+
+    // Update the new custom color space with the current RGB value
+    custom.fromRGB(rgb.r, rgb.g, rgb.b);
+    customSliderUpdate();
+
+    // Hide the new sliders and labels if they were previously hidden
+    if(!customSpaceDisplayed) { hideCustomSpace(); }
+}
+
+function getCustomSpaceLabels() {
+    let elements = [];
+    elements.push(document.getElementById('Value 1'));
+    elements.push(document.getElementById('Value 2'));
+    elements.push(document.getElementById('Value 3'));
+    elements.push(document.getElementById('Value 1 Range'));
+    elements.push(document.getElementById('Value 2 Range'));
+    elements.push(document.getElementById('Value 3 Range'));
+    return elements;
+}
+
+function hideCustomSpace() {
+    customSpaceDisplayed = false;
+
+    // Hide the sliders with p5 function
+    sliderVal1.hide();
+    sliderVal2.hide();
+    sliderVal3.hide();
+
+    // Collect remaining elements and hide by setting their display property
+    let elements = getCustomSpaceLabels();
+    elements.forEach(element => element.style.visibility = 'hidden');
+}
+
+function showCustomSpace() {
+    customSpaceDisplayed = true;
+
+    // Show the sliders with p5 function
+    sliderVal1.show();
+    sliderVal2.show();
+    sliderVal3.show();
+
+    // Collect remaining elements and show by setting their display property
+    let elements = getCustomSpaceLabels();
+    elements.forEach(element => element.style.visibility = 'visible');
+}

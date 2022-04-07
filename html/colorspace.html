@@ -63,7 +63,67 @@
           <p>
             On this tab, you can input your own matrix to set up a custom color space. Check the option below to get started.
           </p>
-          <!-- TODO -->
+          <input type="checkbox" id="display-custom" onchange="customSpaceVisibilityChange()">
+          <label for="display-custom">Display Custom Color Space</label>
+          <p>
+            As a default, the custom matrix is set up to simulate the RGB color space, just with a numerical range of 0 to 1 
+            rather than 0 to 255. Edit the matrix used to convert from RGB to your color space below:
+          </p>
+          <div>
+            <div class="matrix-row">
+              <input id="mat00" class="matrix-element" size=6 value=1>
+              <input id="mat01" class="matrix-element" size=6 value=0>
+              <input id="mat02" class="matrix-element" size=6 value=0>
+            </div>
+            <div style="clear: both;">&nbsp;</div>
+            <div class="matrix-row">
+              <input id="mat10" class="matrix-element" size=6 value=0>
+              <input id="mat11" class="matrix-element" size=6 value=1>
+              <input id="mat12" class="matrix-element" size=6 value=0>
+            </div>
+            <div style="clear: both;">&nbsp;</div>
+            <div class="matrix-row">
+              <input id="mat20" class="matrix-element" size=6 value=0>
+              <input id="mat21" class="matrix-element" size=6 value=0>
+              <input id="mat22" class="matrix-element" size=6 value=1>
+            </div>
+            <div style="clear: both;">&nbsp;</div>
+            <button type="button" onclick="updateMatrix()">Update Matrix</button>
+            <p style="display: inline; color: red;" id="matrix-error-msg"></p>
+          </div>
+          <p>
+            Then, set the range that each value can have:
+          </p>
+          <div>
+            <div class="matrix-row">
+              Value 1: 
+              <input id="range1-lower" size=6 value=0>
+              -
+              <input id="range1-upper" size=6 value=1>
+            </div>
+            <div style="clear: both;">&nbsp;</div>
+            <div class="matrix-row">
+              Value 2: 
+              <input id="range2-lower" size=6 value=0>
+              -
+              <input id="range2-upper" size=6 value=1>
+            </div>
+            <div style="clear: both;">&nbsp;</div>
+            <div class="matrix-row">
+              Value 3: 
+              <input id="range3-lower" size=6 value=0>
+              -
+              <input id="range3-upper" size=6 value=1>
+            </div>
+            <div style="clear: both;">&nbsp;</div>
+            <button type="button" onclick="updateRanges()">Update Ranges</button>
+            <p style="display: inline; color: red;" id="ranges-error-msg"></p>
+          </div>
+          <p>
+            Note that it is important to have a range that correctly matches up with the provided matrix. If it is too 
+            narrow, the custom color space values may be clamped incorrectly when other spaces' values are changed. If 
+            it is too broad, other color spaces' values may be clamped when the custom color space's values are changed.
+          </p>
         </div>
         <div id="Resources" class="tabcontent">
           <p>

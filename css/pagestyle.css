@@ -26,6 +26,15 @@
     width: 60%;
 }
 
+/* Matrix input system */
+.matrix-row {
+    float: left;
+}
+
+.matrix-element {
+    margin-right: 15px;
+}
+
 /* Style the tab */
 .tab {
     overflow: hidden;
