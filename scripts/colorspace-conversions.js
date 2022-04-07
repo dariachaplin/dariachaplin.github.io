@@ -1,3 +1,6 @@
+// Credit to Professor Nan Schaller's resource for color conversion algorithms
+// https://www.cs.rit.edu/~ncs/color/t_convert.html
+
 class RGB {
     constructor(r, g, b) {
         this.r = r;

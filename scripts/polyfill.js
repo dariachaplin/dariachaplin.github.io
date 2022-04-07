@@ -26,19 +26,12 @@ function setup() {
     drawGrid();
     let vtxs;
 
-    // Class slides example - scale up for use ?
-    // vtxs = [new Vertex(20, 30), new Vertex(70, 10), new Vertex(130, 50), new Vertex(130, 110), new Vertex(70, 70), new Vertex(20, 90)];
-
     // Custom shape, simple for this algo
     b1 = createButton('Shape 1');
     b1.position(10, 487);
     b1.mousePressed(() => {
-        // Custom shape
-        // vtxs = [new Vertex(2, 3), new Vertex(7, 1), new Vertex(13, 5), new Vertex(13, 11), new Vertex(7, 7), new Vertex(2, 9)];
-        vtxs = [new Vertex(130, 100), new Vertex(270, 100), new Vertex(290, 120),
-            new Vertex(250, 200), new Vertex(230, 200), new Vertex(200, 300),
-            new Vertex(200, 300), new Vertex(170, 200), new Vertex(150, 200),
-            new Vertex(110, 120)];
+        vtxs = [new Vertex(10, 10), new Vertex(15, 5), new Vertex(30, 20),
+            new Vertex(30, 35), new Vertex(15, 20), new Vertex(10, 25)];
         clear();
         drawGrid();
         resetFlowVars();
@@ -49,9 +42,9 @@ function setup() {
     b2 = createButton('Shape 2');
     b2.position(85, 487);
     b2.mousePressed(() => {
-        vtxs = [new Vertex(100, 100), new Vertex(200, 150), new Vertex(300, 100),
-            new Vertex(250, 200), new Vertex(300, 300), new Vertex(200, 250),
-            new Vertex(100, 300), new Vertex(150, 200)];
+        vtxs = [new Vertex(10, 10), new Vertex(20, 15), new Vertex(30, 10),
+            new Vertex(25, 20), new Vertex(30, 30), new Vertex(20, 25),
+            new Vertex(10, 30), new Vertex(15, 20)];
         clear();
         drawGrid();
         resetFlowVars();
@@ -62,10 +55,10 @@ function setup() {
     b3 = createButton('Shape 3');
     b3.position(160, 487);
     b3.mousePressed(() => {
-        vtxs = [new Vertex(100, 33), new Vertex(200, 108), new Vertex(300, 33),
-            new Vertex(263, 156), new Vertex(366, 233), new Vertex(240, 233),
-            new Vertex(200, 366), new Vertex(160, 233), new Vertex(33, 233),
-            new Vertex(136, 156)];
+        vtxs = [new Vertex(10, 3), new Vertex(20, 10), new Vertex(30, 3),
+            new Vertex(26, 15), new Vertex(36, 23), new Vertex(24, 23),
+            new Vertex(20, 36), new Vertex(16, 23), new Vertex(3, 23),
+            new Vertex(13, 15)];
         clear();
         drawGrid();
         resetFlowVars();
@@ -137,19 +130,12 @@ class EdgeBucket {
 
 // Color in a 10x10 area of the grid, x and y are bottom left coordinate
 function colorBigPixel(x, y) {
-    // circle(x + 5, y + 5, 10);
-    // Round to nearest big pixel first
-    let x_extra = x % 10;
-    x = (x_extra < 5.0) ? x - x_extra : x + (10 - x_extra);
-    let y_extra = y % 10;
-    y = (y_extra < 5.0) ? y - y_extra : y + (10 - y_extra);
+    x *= 10;
+    y *= 10;
 
-    // Now draw
-    for(let i = x; i < x + 10; i++) {
-        for(let j = y; j < y + 10; j++) {
-            point(i, 400 - j); // Adjust y to work with p5 canvas
-        }
-    }
+    stroke('black');
+    fill('black');
+    square(x, 400 - (y + 10), 10);
 }
 
 function createEdgeTable(v) {
@@ -222,7 +208,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// TODO - improve formatting, document
+// Post the latest Active List data to the 'Data Structures' tab
 function updateActiveList(activeList) {
     let element = document.getElementById('Active List');
     element.innerHTML = "<u>Y Max, X, 1/m</u>";
@@ -234,7 +220,7 @@ function updateActiveList(activeList) {
     }
 }
 
-// TODO - improve formatting, document
+// Post the latest Edge Table data to the 'Data Structures' tab
 function updateEdgeTable(edgeTable) {
     let element = document.getElementById('Edge Table');
     element.innerHTML = "";
@@ -280,6 +266,7 @@ async function polyfill(v) {
     // Iterate through the lowest to highest relevant scan lines
     while(y <= upperY) {
         // Discard entries where yMax == y (edge has been completed)
+        if(autoplay) { await sleep(1000); }
         while(!clearAT) { await sleep(300); }
         let activeListCopy = [];
         for(let i = 0; i < activeList.length; i++) {
@@ -291,11 +278,11 @@ async function polyfill(v) {
         updateActiveList(activeList);
 
         // Move all buckets from the current edge table to active list
+        if(autoplay) { await sleep(1000); }
         while(!updateAT) { await sleep(300); }
         if(edgeTable.has(y)) {
             let edges = edgeTable.get(y);
             for(let i = 0; i < edges.length; i++) {
-                // TODO better way to do this ?
                 activeList.push(edges[i]);
             }
             edgeTable.delete(y);
@@ -303,6 +290,7 @@ async function polyfill(v) {
         }
 
         // Sort active list on x (or by 1/m for those with matching x)
+        if(autoplay) { await sleep(1000); }
         while(!sortAT) { await sleep(300); }
         if(activeList.length > 0) { activeList = sortActiveList(activeList); }
         updateActiveList(activeList);
@@ -313,22 +301,20 @@ async function polyfill(v) {
             x1 = ceil(activeList[i].x);
             x2 = floor(activeList[i + 1].x);
             for(let j = x1; j < x2; j++) {
-                // Shape will be black and outlined in grey
-                if(j == x2 || j == x2 - 1) { stroke(100, 100, 100); }
-                else { stroke(0, 0, 0); }
+                stroke(0, 0, 0, 255);
                 colorBigPixel(j, y);
             }
         }
 
         // Increment y and update x values in active list
+        if(autoplay) { await sleep(1000); }
         while(!incScanLine) { await sleep(300); }
-        y += 10; // y++;
+        y++;
         while(!updateXvals) { await sleep(300); }
         for(let i = 0; i < activeList.length; i++) {
             // Can skip over vertical edges
             if(activeList[i].invSlope != 0) {
-                activeList[i].x += 10 * activeList[i].slopeInv;
-                //activeList[i].x += activeList[i].slopeInv;
+                activeList[i].x += activeList[i].slopeInv;
             }
         }
         updateActiveList(activeList);
