@@ -61,6 +61,9 @@ function setup() {
     createCanvas(400, 200);
     background(0);
 
+    // Display the 'Instructions' tab by default
+    document.getElementById('Instructions').style.display = "block";
+
     // Create sliders and labels for each color space
 
     // RGB

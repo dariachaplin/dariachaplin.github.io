@@ -26,7 +26,7 @@
     width: 60%;
 }
 
-/* Matrix input system */
+/* Matrix input system (also used for vertex input)*/
 .matrix-row {
     float: left;
 }
@@ -34,6 +34,9 @@
 .matrix-element {
     margin-right: 15px;
 }
+
+/* The below tab code is from:
+https://www.w3schools.com/howto/howto_js_tabs.asp */
 
 /* Style the tab */
 .tab {
@@ -72,3 +75,39 @@
     border-top: none;
     margin-right: 40px;
 }
+
+/* The below navbar code is modified from:
+https://www.w3schools.com/howto/howto_css_bottom_nav.asp */
+
+/* Place the navbar at the bottom of the page, and make it stick */
+.navbar {
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  
+  /* Style the links inside the navigation bar */
+  .navbar a {
+    float: left;
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+  /* Change the color of links on hover */
+  .navbar a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  /* Add a color to the active/current link */
+  .navbar a.active {
+    background-color: #04AA6D;
+    color: white;
+  }

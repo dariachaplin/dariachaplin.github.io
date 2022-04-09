@@ -45,6 +45,9 @@ function setup() {
     createCanvas(400, 400);
     drawGrid();
     let vtxs;
+    
+    // Display the 'Instructions' tab by default
+    document.getElementById('Instructions').style.display = "block";
 
     // Custom shape, simple for this algo
     b1 = createButton('Shape 1');

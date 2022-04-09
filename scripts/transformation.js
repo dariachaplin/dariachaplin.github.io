@@ -4,6 +4,9 @@ function setup() {
     angleMode(DEGREES);
     setUpAxis();
 
+    // Display the 'Instructions' tab by default
+    document.getElementById('Instructions').style.display = "block";
+
     // Placeholder-ish code to simulate a simple level
 
     let target = [["T", 75, 0], ["T", 0, 75]];
