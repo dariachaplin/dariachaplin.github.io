@@ -2,6 +2,26 @@
 let clearAT = false, updateAT = false, sortAT = false,
     incScanLine = false, updateXvals = false, autoplay = false;
 
+class Vertex {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class EdgeBucket {
+    constructor(yMax, x, slopeInv) {
+        this.yMax = yMax;           // the edge's large y-value
+        this.x = x;                 // the current value of x
+        this.slopeInv = slopeInv;   // 1/m value for edge
+    }
+}
+
+// The user-provided set of custom vertices (filled with a default)
+let customVtxs = [new Vertex(10, 10), new Vertex(30, 10), 
+    new Vertex(20, 30)];
+let numCustomVtxs = 3;
+
 function resetFlowVars() {
     clearAT = false;
     updateAT = false;
@@ -65,6 +85,17 @@ function setup() {
         polyfill(vtxs);
     });
 
+    // Custom shape
+    b0 = createButton('Custom Shape');
+    b0.position(235, 487);
+    b0.mousePressed(() => {
+        vtxs = customVtxs;
+        clear();
+        drawGrid();
+        resetFlowVars();
+        polyfill(vtxs);
+    })
+
     // Buttons to control flow of algorithm
     // Always check if the previous button has been selected
     //      in order to enforce the order of flow
@@ -111,21 +142,6 @@ function setup() {
     });
 
     noLoop();
-}
-
-class Vertex {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class EdgeBucket {
-    constructor(yMax, x, slopeInv) {
-        this.yMax = yMax;           // the edge's large y-value
-        this.x = x;                 // the current value of x
-        this.slopeInv = slopeInv;   // 1/m value for edge
-    }
 }
 
 // Color in a 10x10 area of the grid, x and y are bottom left coordinate
@@ -325,4 +341,88 @@ async function polyfill(v) {
                 incScanLine = false, updateXvals = false;
         }
     }
+}
+
+// Functionality for adding your own shape
+
+// Attempt to draw the outline of the shape given by the vertices
+function previewShape() {
+    clear();
+    drawGrid();
+
+    stroke('black');
+    for(let i = 0; i < customVtxs.length; i++) {
+        if(i == customVtxs.length - 1) {
+            line(customVtxs[i].x * 10, 400 - customVtxs[i].y * 10, 
+                customVtxs[0].x * 10, 400 - customVtxs[0].y * 10);
+        } else {
+            line(customVtxs[i].x * 10, 400 - customVtxs[i].y * 10, 
+                customVtxs[i + 1].x * 10, 400 - customVtxs[i + 1].y * 10);
+        }
+    }
+}
+
+// Check that all the relevant vertices have been filled in
+function allVtxsFilledIn(vtxs) {
+    let error = false;
+
+    vtxs.forEach(vtx => {
+        if(vtx === "") {
+            document.getElementById('vtxs-error-msg').innerHTML = "Error: "
+                + "Please enter values for the first " + numCustomVtxs
+                + " vertices, or update the number of vertices.";
+            error = true;
+        }
+    });
+
+    if(error) { return false; }
+    else { return true; }
+}
+
+// Check that the given vertices are numerical and within bounds
+function validVtxs(vtxs) {
+    let error = false;
+
+    vtxs.forEach(vtx => {
+        if(isNaN(vtx)) {
+            document.getElementById('vtxs-error-msg').innerHTML = "Error: "
+                + "Please ensure that you have entered numeric values.";
+            error = true;
+        } else if(vtx < 0 || vtx > 39) {
+            document.getElementById('vtxs-error-msg').innerHTML = "Error: "
+                + "Please only enter integer values between 0 and 39.";
+            error = true;
+        }
+    });
+
+    if(error) { return false; }
+    else { return true; }
+}
+
+// Update customVtxs based on the input fields on the "Custom Shape" tab
+function updateVtxs() {
+    // Check that the correct number of vertices have been filled in
+    let vtxStrings = [];
+    for(let i = 0; i < numCustomVtxs; i++) {
+        vtxStrings.push(document.getElementById('x' + String(i + 1)).value);
+        vtxStrings.push(document.getElementById('y' + String(i + 1)).value);
+    }
+    if(!allVtxsFilledIn(vtxStrings)) { return; }
+
+    // Check that all inputs are numerical and within the bounds
+    let vtxs = [];
+    vtxStrings.forEach(vtx => vtxs.push(parseInt(vtx)));
+    if(!validVtxs(vtxs)) { return; }
+
+    // Once past error checking, clear error message and update vertices
+    document.getElementById('vtxs-error-msg').innerHTML = "";
+    customVtxs = [];
+    for(let i = 0; i < vtxs.length - 1; i += 2) {
+        customVtxs.push(new Vertex(vtxs[i], vtxs[i + 1]));
+    }
+}
+
+// Update the number of vertices the user wants to customize
+function updateNumVtxs() {
+    numCustomVtxs = document.getElementById('num-vtxs').value;
 }

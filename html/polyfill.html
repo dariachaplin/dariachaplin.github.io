@@ -14,7 +14,7 @@
   </head>
 
   <body>
-    <h1>Polygon Fill Algorithm - IN PROGRESS</h1>
+    <h1>Polygon Fill Algorithm</h1>
     <section class="container">
       <div class="left">
         <script src="../scripts/utility-funcs.js"></script>
@@ -24,6 +24,7 @@
         <div class="tab">
           <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
           <button class="tablinks" onclick="openTab(event, 'Data Structures')">Data Structures</button>
+          <button class="tablinks" onclick="openTab(event, 'Custom Shape')">Custom Shape</button>
           <button class="tablinks" onclick="openTab(event, 'Resources')">Resources</button>
         </div>
 
@@ -48,6 +49,59 @@
           <p id="Edge Table"></p>
           <h3>Active List</h3>
           <p id="Active List"></p>
+        </div>
+        <div id="Custom Shape" class="tabcontent">
+          <p>On this tab, you can edit a custom shape to test the polygon fill algorithm with. By default, 
+            the custom shape is a basic triangle.</p>
+          <p>To make your own shape, start by selecting a number of vertices from the input below.</p>
+          <label for="num-vtxs">Number of Vertices:</label>
+          <input type="number" id="num-vtxs" onchange="updateNumVtxs()" min="3" max="6" value=3>
+          <p>Then, fill in the values for the correct number of vertices below, entering them in either 
+            a clockwise or counterclockwise order. Each number should be an integer from 0 to 39 
+            (decimals will be truncated). After entering all the necessary values, hit 'Update Vertices' 
+            below to validate your changes.</p>
+          <div class="matrix-row">
+            <p style="display: inline; margin-right: 10px;">Vertex 1: </p>
+            <input id="x1" class="matrix-element" size=6 value=10>
+            <input id="y1" class="matrix-element" size=6 value=10>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <div class="matrix-row">
+            <p style="display: inline; margin-right: 10px;">Vertex 2: </p>
+            <input id="x2" class="matrix-element" size=6 value=30>
+            <input id="y2" class="matrix-element" size=6 value=10>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <div class="matrix-row">
+            <p style="display: inline; margin-right: 10px;">Vertex 3: </p>
+            <input id="x3" class="matrix-element" size=6 value=20>
+            <input id="y3" class="matrix-element" size=6 value=30>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <div class="matrix-row">
+            <p style="display: inline; margin-right: 10px;">Vertex 4: </p>
+            <input id="x4" class="matrix-element" size=6>
+            <input id="y4" class="matrix-element" size=6>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <div class="matrix-row">
+            <p style="display: inline; margin-right: 10px;">Vertex 5: </p>
+            <input id="x5" class="matrix-element" size=6>
+            <input id="y5" class="matrix-element" size=6>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <div class="matrix-row">
+            <p style="display: inline; margin-right: 10px;">Vertex 6: </p>
+            <input id="x6" class="matrix-element" size=6>
+            <input id="y6" class="matrix-element" size=6>
+          </div>
+          <div style="clear: both;">&nbsp;</div>
+          <button type="button" onclick="updateVtxs()">Update Vertices</button>
+          <p style="display: inline; color: red;" id="vtxs-error-msg"></p>
+          <p>Use the 'Preview Shape' button to ensure that the vertices you entered 
+            match your intended shape. This will only work if you successfully 
+            updated the custom vertices and have no error messages.</p>
+          <button type="button" onclick="previewShape()">Preview Shape</button>
         </div>
         <div id="Resources" class="tabcontent">
           <p>
