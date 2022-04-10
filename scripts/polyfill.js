@@ -52,32 +52,32 @@ function setup() {
     // Custom shape, simple for this algo
     b1 = createButton('Shape 1');
     b1.position(10, 487);
-    b1.mousePressed(() => {
+    b1.mousePressed(async () => {
         vtxs = [new Vertex(10, 10), new Vertex(15, 5), new Vertex(30, 20),
             new Vertex(30, 35), new Vertex(15, 20), new Vertex(10, 25)];
         clear();
         drawGrid();
         resetFlowVars();
-        polyfill(vtxs);
+        await polyfill(vtxs);
     });
 
     // 4-pointed star
     b2 = createButton('Shape 2');
     b2.position(85, 487);
-    b2.mousePressed(() => {
+    b2.mousePressed(async () => {
         vtxs = [new Vertex(10, 10), new Vertex(20, 15), new Vertex(30, 10),
             new Vertex(25, 20), new Vertex(30, 30), new Vertex(20, 25),
             new Vertex(10, 30), new Vertex(15, 20)];
         clear();
         drawGrid();
         resetFlowVars();
-        polyfill(vtxs);
+        await polyfill(vtxs);
     });
 
     // Star shape
     b3 = createButton('Shape 3');
     b3.position(160, 487);
-    b3.mousePressed(() => {
+    b3.mousePressed(async () => {
         vtxs = [new Vertex(10, 3), new Vertex(20, 10), new Vertex(30, 3),
             new Vertex(26, 15), new Vertex(36, 23), new Vertex(24, 23),
             new Vertex(20, 36), new Vertex(16, 23), new Vertex(3, 23),
@@ -85,18 +85,18 @@ function setup() {
         clear();
         drawGrid();
         resetFlowVars();
-        polyfill(vtxs);
+        await polyfill(vtxs);
     });
 
     // Custom shape
     b0 = createButton('Custom Shape');
     b0.position(235, 487);
-    b0.mousePressed(() => {
+    b0.mousePressed(async () => {
         vtxs = customVtxs;
         clear();
         drawGrid();
         resetFlowVars();
-        polyfill(vtxs);
+        await polyfill(vtxs);
     })
 
     // Buttons to control flow of algorithm
@@ -230,7 +230,7 @@ function sleep(ms) {
 // Post the latest Active List data to the 'Data Structures' tab
 function updateActiveList(activeList) {
     let element = document.getElementById('Active List');
-    element.innerHTML = "<u>Y Max, X, 1/m</u>";
+    element.innerHTML = "<i>Y Max, X, 1/m</i>";
 
     for(let i = 0; i < activeList.length; i++) {
         let edge = activeList[i];
@@ -242,11 +242,11 @@ function updateActiveList(activeList) {
 // Post the latest Edge Table data to the 'Data Structures' tab
 function updateEdgeTable(edgeTable) {
     let element = document.getElementById('Edge Table');
-    element.innerHTML = "";
+    element.innerHTML = "<i>Y Max, X, 1/m<br></i>";
     let keys = Array.from(edgeTable.keys()).sort(function(a,b) {return a - b;});
 
     for(let i = 0; i < keys.length; i++) {
-        element.innerHTML += "<u>" + keys[i] + "</u>:";
+        element.innerHTML += "<p><u>" + keys[i] + "</u>:</p>";
         let buckets = edgeTable.get(keys[i]);
         for(let j = 0; j < buckets.length; j++) {
             let edge = buckets[j];
