@@ -1,7 +1,7 @@
 // Global values to control flow of polygon fill algorithm
 let clearAT = false, updateAT = false, sortAT = false,
-    incScanLine = false, updateXvals = false, autoplay = false;
-let speed = 500;
+    incScanLine = false, updateXvals = false, autoplayShape = false;
+let autoplaySpeed = 500;
 let vtxs = [];
 
 class Vertex {
@@ -30,7 +30,7 @@ function resetFlowVars() {
     sortAT = false;
     incScanLine = false;
     updateXvals = false;
-    autoplay = false;
+    autoplayShape = false;
 }
 
 // Set background and draw a grid
@@ -141,7 +141,7 @@ function setup() {
     b9 = createButton('Complete Shape');
     b9.position(10, 577);
     b9.mousePressed(() => {
-        autoplay = true;
+        autoplayShape = true;
         clearAT = true;
         updateAT = true;
         sortAT = true;
@@ -156,7 +156,7 @@ function setup() {
     speedSlider.position(185, 577);
     speedSlider.input(() => {
         // "Reverse" the slider so that it represents increasing speed
-        speed = 1000 - speedSlider.value();
+        autoplaySpeed = 1000 - speedSlider.value();
     });
 
     noLoop();
@@ -300,7 +300,7 @@ async function polyfill(v) {
     // Iterate through the lowest to highest relevant scan lines
     while(y <= upperY) {
         // Discard entries where yMax == y (edge has been completed)
-        if(autoplay) { await sleep(speed); }
+        if(autoplayShape) { await sleep(autoplaySpeed); }
         while(!clearAT) { await sleep(300); }
         let activeListCopy = [];
         for(let i = 0; i < activeList.length; i++) {
@@ -312,7 +312,7 @@ async function polyfill(v) {
         updateActiveList(activeList);
 
         // Move all buckets from the current edge table to active list
-        if(autoplay) { await sleep(speed); }
+        if(autoplayShape) { await sleep(autoplaySpeed); }
         while(!updateAT) { await sleep(300); }
         if(edgeTable.has(y)) {
             let edges = edgeTable.get(y);
@@ -324,7 +324,7 @@ async function polyfill(v) {
         }
 
         // Sort active list on x (or by 1/m for those with matching x)
-        if(autoplay) { await sleep(speed); }
+        if(autoplayShape) { await sleep(autoplaySpeed); }
         while(!sortAT) { await sleep(300); }
         if(activeList.length > 0) { activeList = sortActiveList(activeList); }
         updateActiveList(activeList);
@@ -341,7 +341,7 @@ async function polyfill(v) {
         }
 
         // Increment y and update x values in active list
-        if(autoplay) { await sleep(speed); }
+        if(autoplayShape) { await sleep(autoplaySpeed); }
         while(!incScanLine) { await sleep(300); }
         y++;
         while(!updateXvals) { await sleep(300); }
@@ -354,7 +354,7 @@ async function polyfill(v) {
         updateActiveList(activeList);
 
         // Reset the control flow variables if not autoplaying
-        if(!autoplay) {
+        if(!autoplayShape) {
             clearAT = false, updateAT = false, sortAT = false, 
                 incScanLine = false, updateXvals = false;
         }

@@ -1,13 +1,13 @@
-let rgb = new RGB(0, 0, 0);
+let rgb = new RGBColor(0, 0, 0);
 let sliderR, sliderG, sliderB;
 
-let hsv = new HSV(0, 0, 0);
+let hsv = new HSVColor(0, 0, 0);
 let sliderH, sliderS, sliderV;
 
-let yiq = new YIQ(0, 0, 0);
+let yiq = new YIQColor(0, 0, 0);
 let sliderY, sliderI, sliderQ;
 
-let custom = new CustomSpace(0, 0, 0, [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+let custom = new CustomSpaceColor(0, 0, 0, [[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
 let sliderVal1, sliderVal2, sliderVal3;
 let customSpaceDisplayed = false;
 
@@ -152,7 +152,7 @@ function setup() {
     hideCustomSpace();
 
     // Set the initial color to orange
-    rgb = new RGB(0.87, 0.45, 0.04);
+    rgb = new RGBColor(0.87, 0.45, 0.04);
     rgbValUpdate();
     rgbSliderUpdate();
 

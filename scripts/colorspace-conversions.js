@@ -1,7 +1,7 @@
 // Credit to Professor Nan Schaller's resource for color conversion algorithms
 // https://www.cs.rit.edu/~ncs/color/t_convert.html
 
-class RGB {
+class RGBColor {
     constructor(r, g, b) {
         this.r = r;
         this.g = g;
@@ -17,7 +17,7 @@ class RGB {
 
         if(delta == 0 || max === 0) {
             // Grayscale color, only V component is meaningful
-            return new HSV(0, 0, max);
+            return new HSVColor(0, 0, max);
         } else {
             v = max;
             s = delta / max;
@@ -38,7 +38,7 @@ class RGB {
         h *= 60;
         if(h < 0) { h += 360; }
 
-        return new HSV(h, s, v);
+        return new HSVColor(h, s, v);
     }
 
     toYIQ() {
@@ -46,7 +46,7 @@ class RGB {
         let i = 0.596 * this.r + -0.275 * this.g + -0.321 * this.b;
         let q = 0.212 * this.r + -0.523 * this.g + 0.311 * this.b;
 
-        return new YIQ(y, i, q);
+        return new YIQColor(y, i, q);
     }
 
     toXYZ() {
@@ -54,11 +54,11 @@ class RGB {
         let y = 0.212671 * this.r + 0.715160 * this.g + 0.072169 * this.b;
         let z = 0.019334 * this.r + 0.119193 * this.g + 0.950227 * this.b;
 
-        return new XYZ(x, y, z);
+        return new XYZColor(x, y, z);
     }
 }
 
-class HSV {
+class HSVColor {
     constructor(h, s, v) {
         this.h = h;
         this.s = s;
@@ -72,7 +72,7 @@ class HSV {
         if(this.s === 0) {
             // Grayscale color, only V component is meaningful
             r = g = b = this.v;
-            return new RGB(r, g, b);
+            return new RGBColor(r, g, b);
         }
 
         let h_ = this.h / 60; // h_ holds sector of h (0 to 5)
@@ -115,11 +115,11 @@ class HSV {
                 break;
         }
 
-        return new RGB(r, g, b);
+        return new RGBColor(r, g, b);
     }
 }
 
-class YIQ {
+class YIQColor {
     constructor(y, i, q) {
         this.y = y;
         this.i = i;
@@ -131,11 +131,11 @@ class YIQ {
         let g = 1.0 * this.y + -0.272 * this.i + -0.647 * this.q;
         let b = 1.0 * this.y + -1.105 * this.i + 1.702 * this.q;
 
-        return new RGB(r, g, b);
+        return new RGBColor(r, g, b);
     }
 }
 
-class XYZ {
+class XYZColor {
     constructor(x, y, z) {
         this.x = x;
         this.y = y;
@@ -147,7 +147,7 @@ class XYZ {
         let g = -0.969256 * this.x + 1.875992 * this.y + 0.041556 * this.z;
         let b = 0.055648 * this.x + -0.204043 * this.y + 1.057311 * this.z;
 
-        return new RGB(r, g, b);
+        return new RGBColor(r, g, b);
     }
 
     f(t) {
@@ -175,11 +175,11 @@ class XYZ {
         a = 500 * (f(this.x / xn) - f(this.y / yn));
         b = 200 * (f(this.y / yn) - f(this.z / zn));
 
-        return new LAB(l, a, b);
+        return new LABColor(l, a, b);
     }
 }
 
-class LAB {
+class LABColor {
     constructor(l, a, b) {
         this.l = l;
         this.a = a;
@@ -200,14 +200,14 @@ class LAB {
 
         // This calculation only works for y / yn < 0.008856
         if(y / yn > 0.008856) {
-            return new XYZ(x, y, z);
+            return new XYZColor(x, y, z);
         } else {
             return -1;
         }
     }
 }
 
-class CustomSpace {
+class CustomSpaceColor {
     // v1, v2, v3 are the color values
     // Matrix to transform RGB to this space is provided by 'mat' variables
     constructor(v1, v2, v3, mat) {
@@ -225,7 +225,7 @@ class CustomSpace {
         let g = this.matInv[1][0] * this.v1 + this.matInv[1][1] * this.v2 + this.matInv[1][2] * this.v3;
         let b = this.matInv[2][0] * this.v1 + this.matInv[2][1] * this.v2 + this.matInv[2][2] * this.v3;
 
-        return new RGB(r, g, b);
+        return new RGBColor(r, g, b);
     }
 
     fromRGB(r, g, b) {
