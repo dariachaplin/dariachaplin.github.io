@@ -1,6 +1,8 @@
 // Global values to control flow of polygon fill algorithm
 let clearAT = false, updateAT = false, sortAT = false,
     incScanLine = false, updateXvals = false, autoplay = false;
+let speed = 500;
+let vtxs = [];
 
 class Vertex {
     constructor(x, y) {
@@ -44,7 +46,6 @@ function drawGrid() {
 function setup() {
     createCanvas(400, 400);
     drawGrid();
-    let vtxs;
     
     // Display the 'Instructions' tab by default
     document.getElementById('Instructions').style.display = "block";
@@ -58,6 +59,7 @@ function setup() {
         clear();
         drawGrid();
         resetFlowVars();
+        previewShape();
         await polyfill(vtxs);
     });
 
@@ -71,6 +73,7 @@ function setup() {
         clear();
         drawGrid();
         resetFlowVars();
+        previewShape();
         await polyfill(vtxs);
     });
 
@@ -85,6 +88,7 @@ function setup() {
         clear();
         drawGrid();
         resetFlowVars();
+        previewShape();
         await polyfill(vtxs);
     });
 
@@ -96,8 +100,9 @@ function setup() {
         clear();
         drawGrid();
         resetFlowVars();
+        previewShape();
         await polyfill(vtxs);
-    })
+    });
 
     // Buttons to control flow of algorithm
     // Always check if the previous button has been selected
@@ -142,6 +147,16 @@ function setup() {
         sortAT = true;
         incScanLine = true;
         updateXvals = true;
+    });
+    
+    speedSliderLabel = createP('Speed:');
+    speedSliderLabel.position(140, 562);
+
+    speedSlider = createSlider(0, 1000, 500, 100);
+    speedSlider.position(185, 577);
+    speedSlider.input(() => {
+        // "Reverse" the slider so that it represents increasing speed
+        speed = 1000 - speedSlider.value();
     });
 
     noLoop();
@@ -285,7 +300,7 @@ async function polyfill(v) {
     // Iterate through the lowest to highest relevant scan lines
     while(y <= upperY) {
         // Discard entries where yMax == y (edge has been completed)
-        if(autoplay) { await sleep(1000); }
+        if(autoplay) { await sleep(speed); }
         while(!clearAT) { await sleep(300); }
         let activeListCopy = [];
         for(let i = 0; i < activeList.length; i++) {
@@ -297,7 +312,7 @@ async function polyfill(v) {
         updateActiveList(activeList);
 
         // Move all buckets from the current edge table to active list
-        if(autoplay) { await sleep(1000); }
+        if(autoplay) { await sleep(speed); }
         while(!updateAT) { await sleep(300); }
         if(edgeTable.has(y)) {
             let edges = edgeTable.get(y);
@@ -309,7 +324,7 @@ async function polyfill(v) {
         }
 
         // Sort active list on x (or by 1/m for those with matching x)
-        if(autoplay) { await sleep(1000); }
+        if(autoplay) { await sleep(speed); }
         while(!sortAT) { await sleep(300); }
         if(activeList.length > 0) { activeList = sortActiveList(activeList); }
         updateActiveList(activeList);
@@ -326,7 +341,7 @@ async function polyfill(v) {
         }
 
         // Increment y and update x values in active list
-        if(autoplay) { await sleep(1000); }
+        if(autoplay) { await sleep(speed); }
         while(!incScanLine) { await sleep(300); }
         y++;
         while(!updateXvals) { await sleep(300); }
@@ -349,18 +364,24 @@ async function polyfill(v) {
 // Functionality for adding your own shape
 
 // Attempt to draw the outline of the shape given by the vertices
+
+function previewCustomShape() {
+    vtxs = customVtxs;
+    previewShape();
+}
+
 function previewShape() {
     clear();
     drawGrid();
 
     stroke('black');
-    for(let i = 0; i < customVtxs.length; i++) {
-        if(i == customVtxs.length - 1) {
-            line(customVtxs[i].x * 10, 400 - customVtxs[i].y * 10, 
-                customVtxs[0].x * 10, 400 - customVtxs[0].y * 10);
+    for(let i = 0; i < vtxs.length; i++) {
+        if(i == vtxs.length - 1) {
+            line(vtxs[i].x * 10, 400 - vtxs[i].y * 10, 
+                vtxs[0].x * 10, 400 - vtxs[0].y * 10);
         } else {
-            line(customVtxs[i].x * 10, 400 - customVtxs[i].y * 10, 
-                customVtxs[i + 1].x * 10, 400 - customVtxs[i + 1].y * 10);
+            line(vtxs[i].x * 10, 400 - vtxs[i].y * 10, 
+                vtxs[i + 1].x * 10, 400 - vtxs[i + 1].y * 10);
         }
     }
 }
