@@ -1,6 +1,6 @@
 let level = 1, levelLabel = 'Level 1', maxLevel = 5;
-let sliders = [];
 let coordThresh = 2, angleThresh = 5, scaleThresh = 0.2;
+let transforms = [], curPosition;
 
 // Position class used to keep track of transformed coordinates
 // Based on this solution:
@@ -76,61 +76,86 @@ function setup() {
     // Start the user off at level 1
     level1();
 
-    document.getElementById('val-1').setAttribute('min', 1);
-
     noLoop();
 }
 
 // Functions to add to and update the sequence of transforms on 'Instructions' tab
 
 function setupInput(num, min, max, label) {
-    let val = document.getElementById('val-' + num);
-    val.style.visibility = 'visible';
+    let valLabel = document.createElement('label');
+    valLabel.setAttribute('id', 'val-' + num + '-label');
+    valLabel.setAttribute('for', 'val-' + num);
+    valLabel.innerHTML = label + ':';
+    valLabel.style.marginRight = '10px';
+    
+    let val = document.createElement('input');
+    val.setAttribute('id', 'val-' + num)
+    val.setAttribute('type', 'number');
     val.setAttribute('min', min);
     val.setAttribute('max', max);
-    val.value = "";
+    val.style.marginRight = '20px';
+    // TODO onchange function
     
-    let valLabel = document.getElementById('val-' + num + '-label');
-    valLabel.style.visibility = 'visible';
-    valLabel.innerHTML = label + ':';
+    let inputDiv = document.getElementById('transform-inputs');
+    inputDiv.appendChild(valLabel);
+    inputDiv.appendChild(val);
 }
 
-function hideInput(num) {
-    let val = document.getElementById('val-' + num);
-    val.style.visibility = 'hidden';
-    val.value = "";
+function deleteInput(num) {
+    document.getElementById('val-' + num).remove();
+    document.getElementById('val-' + num + '-label').remove();
+    document.getElementById('delete-' + num).remove();
+}
 
-    let valLabel = document.getElementById('val-' + num + '-label');
-    valLabel.style.visibility = 'hidden';
+function startInputLine(transform) {
+    let transformLabel = document.createElement('b');
+    transformLabel.innerHTML = transform;
+    transformLabel.style.marginRight = '15px';
+
+    let inputDiv = document.getElementById('transform-inputs');
+    inputDiv.appendChild(transformLabel);
+}
+
+function endInputLine(num) {
+    let deleteButton = document.createElement('button');
+    deleteButton.setAttribute('id', 'delete-' + num);
+    deleteButton.innerHTML = '✕';
+    deleteButton.setAttribute('onclick', 'deleteInput(' + num + ')');
+
+    let lineBreak = document.createElement('div');
+    lineBreak.innerHTML = '&nbsp';
+
+    let inputDiv = document.getElementById('transform-inputs');
+    inputDiv.appendChild(deleteButton);
+    inputDiv.appendChild(lineBreak);
 }
 
 function addTranslation() {
-    // TODO clamp translation values to fit to canvas based on current position
-    setupInput('1', -200, 200, 'X');
-    setupInput('2', -200, 200, 'Y');
+    // Using current position to clamp X/Y values to the canvas
+    curPosition.x = 100;
+    curPosition.y = 100;
+    startInputLine('T');
+    setupInput('1', -200 + curPosition.x, 200 - curPosition.x, 'X');
+    setupInput('2', -200 + curPosition.y, 200 - curPosition.y, 'Y');
+    endInputLine('1');
 }
 
 function addRotation() {
-    setupInput('1', -360, 360, 'Angle (degrees)');
-    hideInput('2');
+    startInputLine('R');
+    setupInput('3', 0, 360, 'Angle (degrees)');
+    endInputLine('3');
 }
 
 function addScaling() {
-    setupInput('1', -3, 3, 'X');
-    setupInput('2', -3, 3, 'Y');
+    startInputLine('S');
+    setupInput('4', -3, 3, 'X');
+    setupInput('5', -3, 3, 'Y');
+    endInputLine('4');
 }
 
-function updateVal1() {
-    let val = parseFloat(document.getElementById('val-1').value);
-    // TODO
-}
+// TODO functions to add new transforms to sequence and update values
 
-function updateVal2() {
-    let val = parseFloat(document.getElementById('val-2').value);
-    // TODO
-}
-
-function updateTransforms(transforms) {
+function updateTransforms() {
     let str = "";
     transforms.forEach(transform => {
         str += transform[0] + "(" + transform[1];
@@ -146,13 +171,9 @@ function updateTransforms(transforms) {
 // Level changing and specific level implementation functions
 
 function changeLevel() {
-    // Clear out previous level's sliders
-    sliders.forEach(slider => slider.remove());
-    sliders = [];
-
     // Clear out input boxes
-    hideInput('1');
-    hideInput('2');
+    // TODO
+    updateTransforms();
 
     if(level == 1) { level1(); }
     else if(level == 2) { level2(); }
@@ -163,50 +184,27 @@ function changeLevel() {
 
 function level1() {
     let target = [["T", -45, -100]];
-    let house = [["T", 0, 0], ["T", 0, 0]];
-    transformHouse(house, target);
-
-    s1 = createSlider(-200, 200);
-    s1.value(0);
-    s1.position(9, 510);
-    s1.input(() => {
-        house[0][1] = s1.value();
-        transformHouse(house, target);
-    });
-    sliders.push(s1);
-
-    s2 = createSlider(-200, 200);
-    s2.value(0);
-    s2.position(150, 510);
-    s2.input(() => {
-        house[1][2] = s2.value();
-        transformHouse(house, target);
-    });
-    sliders.push(s2);
+    transformHouse(transforms, target);
 }
 
 function level2() {
     let target = [["T", 100, 100], ["R", 90]];
-    let house = [];
-    transformHouse(house, target);
+    transformHouse(transforms, target);
 }
 
 function level3() {
     let target = [["T", -100, 0], ["S", 2, 2]];
-    let house = [];
-    transformHouse(house, target);
+    transformHouse(transforms, target);
 }
 
 function level4() {
     let target = [["S", 1.5, 1], ["R", 180], ["T", -45, 50]];
-    let house = [];
-    transformHouse(house, target);
+    transformHouse(transforms, target);
 }
 
 function level5() {
     let target = [["R", 30], ["S", 3, 1], ["T", 30, 0], ["R", -60]];
-    let house = [];
-    transformHouse(house, target);
+    transformHouse(transforms, target);
 }
 
 // Functions to perform transformations and check for solution matches
@@ -246,7 +244,7 @@ function star() {
 // Perform the given list of transforms to prepare for drawing
 // Return the transformed position
 function performTransforms(lst) {
-    let pos = new Position(0, 0, 0, 1, 1);
+    pos = new Position(0, 0, 0, 1, 1);
 
     if(lst.length == 0) { return pos; }
 
@@ -271,6 +269,7 @@ function performTransforms(lst) {
         }
     }
 
+    curPosition = pos; // Update global storage of the position
     return pos;
 }
 
@@ -295,8 +294,7 @@ function transformHouse(house, target) {
     // Apply current transformations and redraw main house
     push();
     let mainPos = performTransforms(house);
-    updateTransforms(house);
-    console.log(mainPos); // TODO remove after debugging complete
+    updateTransforms();
     fill('blue');
     square(-25, -25, 50);
     fill('limegreen');
@@ -308,7 +306,6 @@ function transformHouse(house, target) {
     // Draw a star if the transformed house lines up with the target
     if(mainPos.approxEqualTo(targetPos)) {
         star();
-        sliders.forEach(slider => slider.remove());
-        sliders = [];
+        // TODO clear out input boxes
     }
 }
