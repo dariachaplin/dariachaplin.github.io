@@ -28,6 +28,8 @@
       <div class="right">
         <div class="tab">
           <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
+          <button class="tablinks" onclick="openTab(event, 'Custom Level Design')">Custom Level Design</button>
+          <button class="tablinks" onclick="openTab(event, 'Play Saved Levels')">Play Saved Levels</button>
           <button class="tablinks" onclick="openTab(event, 'Resources')">Resources</button>
         </div>
 
@@ -45,7 +47,7 @@
             sequence, and it will also appear at the bottom of the input rows. You can delete a transform by clicking the "X" 
             button on its input row.</p>
           <p>Modify the transforms and their values until your house matches up with the goal and a star appears. Try the later 
-            levels for more of a challenge!</p>
+            levels for more of a challenge, or see the other tabs to create your own levels!</p>
           <br>
           <h3>Current Sequence of Transforms</h3>
           <p id="sequence"></p>
@@ -53,8 +55,37 @@
           <button type="button" onclick="addTranslation()">Add Translation</button>
           <button type="button" onclick="addRotation()">Add Rotation</button>
           <button type="button" onclick="addScaling()">Add Scaling</button>
-          <div style="clear: both;">&nbsp;</div>
+          <div>&nbsp;</div>
           <div id="transform-inputs"></div>
+        </div>
+        <div id="Custom Level Design" class="tabcontent">
+          <p>On this tab, you can use similar selection methods to the game to create your own level. Enter a level 
+            name and as many transforms as desired (feel free to try out your transforms on the game to double check 
+            that they match your goal!). Note that if a level exists with the same name, it will be overwritten.</p>
+          <label for="custom-level-name">Name:</label>
+          <input type="text" id="custom-level-name">
+          <p>Current sequence:</p>
+          <p id="custom-sequence"></p>
+          <button type="button" onclick="addTranslation(true)">Add Translation</button>
+          <button type="button" onclick="addRotation(true)">Add Rotation</button>
+          <button type="button" onclick="addScaling(true)">Add Scaling</button>
+          <div>&nbsp;</div>
+          <div id="custom-transform-inputs"></div>
+          <button type="button" onclick="saveCustomLevel()">Save</button>
+        </div>
+        <div id="Play Saved Levels" class="tabcontent">
+          <p>To play your saved levels rather than the default selection, select the checkbox below. Uncheck it to return 
+            to playing the default levels.</p>
+          <input type="checkbox" id="saved-levels-checkbox" onclick="toggleCustomPlay()">
+          <label for="saved-levels-checkbox">Play custom levels</label> 
+          <p>Use the below button to refresh the list of saved levels available. If no selections show up, use the "Custom 
+            Level Design" tab to create and save your first one.</p>
+          <button type="button" id="load-levels-button" onclick="loadSavedLevels()" disabled>Load Saved Levels</button>
+          <div>&nbsp;</div>
+          <label for="level-select">Select a level to play:</label>
+          <select id="level-select" onchange="selectCustomLevel()" disabled></select>
+          <p>Once you've selected your level, return to the "Instructions" tab in order to play through the level. Come 
+            back to this tab to switch to another level or to switch to the default levels.</p>
         </div>
         <div id="Resources" class="tabcontent">
           <p>

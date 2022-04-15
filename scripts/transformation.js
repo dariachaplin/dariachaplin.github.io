@@ -1,6 +1,7 @@
 let level = 1, levelLabel = 'Level 1', maxLevel = 5;
 let coordThresh = 2, angleThresh = 5, scaleThresh = 0.2;
 let transforms = [], targetTransforms = [], curPosition;
+let customTransforms = [];
 
 // Position class used to keep track of transformed coordinates
 // Based on this solution:
@@ -54,10 +55,10 @@ function setup() {
 
     let bPrevious = createButton('Previous');
     bPrevious.position(8, 486);
+    bPrevious.id('prev-button');
     bPrevious.mousePressed(() => {
         if(level == maxLevel) { bNext.show(); }
         level -= 1;
-        document.getElementById('level-label').innerHTML = 'Level ' + level;
         if(level == 1) { bPrevious.hide(); }
         changeLevel();
     });
@@ -65,10 +66,10 @@ function setup() {
 
     let bNext = createButton('Next');
     bNext.position(365, 486);
+    bNext.id('next-button');
     bNext.mousePressed(() => {
         if(level == 1) { bPrevious.show(); }
         level += 1;
-        document.getElementById('level-label').innerHTML = 'Level ' + level;
         if(level == maxLevel) { bNext.hide(); }
         changeLevel();
     });
@@ -76,22 +77,28 @@ function setup() {
     // Start the user off at level 1
     level1();
 
+    // Set up the collection of saved levels if there are none
+    if(window.localStorage.getItem('saved-levels') === null) {
+        window.localStorage.setItem('saved-levels', JSON.stringify([]));
+    }
+
     noLoop();
 }
 
 // Functions to add to and update the sequence of transforms on 'Instructions' tab
 
-function startInputLine(transform, num) {
+function startInputLine(transform, num, custom = false) {
     let transformLabel = document.createElement('b');
     transformLabel.setAttribute('id', 'label-' + num);
     transformLabel.innerHTML = transform;
     transformLabel.style.marginRight = '15px';
 
-    let inputDiv = document.getElementById('transform-inputs');
+    let divName = custom ? 'custom-transform-inputs' : 'transform-inputs';
+    let inputDiv = document.getElementById(divName);
     inputDiv.appendChild(transformLabel);
 }
 
-function setupInput(num, min, max, label) {
+function setupInput(num, min, max, step, label, custom = false) {
     let valLabel = document.createElement('label');
     valLabel.setAttribute('id', 'val-' + num + '-label');
     valLabel.setAttribute('for', 'val-' + num);
@@ -103,30 +110,33 @@ function setupInput(num, min, max, label) {
     val.setAttribute('type', 'number');
     val.setAttribute('min', min);
     val.setAttribute('max', max);
-    val.setAttribute('onchange', 'updateValue(\'' + num + '\')');
+    val.setAttribute('step', step);
+    val.setAttribute('onchange', 'updateValue(\'' + num + '\', ' + custom + ')');
     val.style.marginRight = '20px';
     
-    let inputDiv = document.getElementById('transform-inputs');
+    let divName = custom ? 'custom-transform-inputs' : 'transform-inputs';
+    let inputDiv = document.getElementById(divName);
     inputDiv.appendChild(valLabel);
     inputDiv.appendChild(val);
 }
 
-function endInputLine(num) {
-    let deleteButton = document.createElement('button');
-    deleteButton.setAttribute('id', 'delete-' + num);
-    deleteButton.innerHTML = '✕';
-    deleteButton.setAttribute('onclick', 'deleteInput(\'' + num + '\')');
+function endInputLine(num, custom = false) {
+    let xButton = document.createElement('button');
+    xButton.setAttribute('id', 'delete-' + num);
+    xButton.innerHTML = '✕';
+    xButton.setAttribute('onclick', 'deleteInput(\'' + num + '\', ' + custom + ')');
 
     let lineBreak = document.createElement('div');
     lineBreak.setAttribute('id', 'break-' + num);
     lineBreak.innerHTML = '&nbsp';
 
-    let inputDiv = document.getElementById('transform-inputs');
-    inputDiv.appendChild(deleteButton);
+    let divName = custom ? 'custom-transform-inputs' : 'transform-inputs';
+    let inputDiv = document.getElementById(divName);
+    inputDiv.appendChild(xButton);
     inputDiv.appendChild(lineBreak);
 }
 
-function deleteInput(num) {
+function deleteInput(num, custom = false) {
     document.getElementById('label-' + num).remove();
     document.getElementById('val-' + num + '-1').remove();
     document.getElementById('val-' + num + '-1-label').remove();
@@ -143,65 +153,87 @@ function deleteInput(num) {
     // "Remove" from transforms list by replacing with an "X"
     // Doing this in order to avoid issues with deleting elements, would become hard
     //    to properly ID elements and their position in the array
-    transforms[transforms.length - 1 - num] = ["X"];
-    transformHouse(transforms, targetTransforms);
+    if(custom) {
+        customTransforms[customTransforms.length - 1 - num] = ["X"];
+        updateTransforms(custom);
+    } else {
+        transforms[transforms.length - 1 - num] = ["X"];
+        transformHouse(transforms, targetTransforms);
+    }
 }
 
-function deleteAllInputs() {
-    let len = transforms.length;
+function deleteAllInputs(custom = false) {
+    let curTransforms = custom ? customTransforms : transforms;
+    let len = curTransforms.length;
 
     for(let i = 0; i < len; i++) {
-        if(transforms[i][0] != "X") {
-            deleteInput(len - 1 - i);
+        if(curTransforms[i][0] != "X") {
+            deleteInput(len - 1 - i, custom);
         }
     }
 }
 
-function updateValue(num) {
+function updateValue(num, custom = false) {
     let newVal = document.getElementById('val-' + String(num)).value;
-    transforms[transforms.length - 1 - num[0]][num[2]] = parseFloat(newVal);
-    transformHouse(transforms, targetTransforms);
+    if(custom) {
+        customTransforms[customTransforms.length - 1 - num[0]][num[2]] 
+            = parseFloat(newVal);
+        updateTransforms(custom);
+    } else {
+        transforms[transforms.length - 1 - num[0]][num[2]] 
+            = parseFloat(newVal);
+        transformHouse(transforms, targetTransforms);
+    }
 }
 
-function addTranslation() {
-    let num = transforms.length;
+function addTranslation(custom = false) {
+    // Use current position to clamp X/Y values to the canvas
+    let minX = -200 + curPosition.x;
+    let maxX = 200 - curPosition.x;
+    let minY = -200 + curPosition.y;
+    let maxY = 200 - curPosition.y;
 
-    // Note - using current position to clamp X/Y values to the canvas
-    startInputLine('T', num);
-    setupInput(num + '-1', -200 + curPosition.x, 200 - curPosition.x, 'X');
-    setupInput(num + '-2', -200 + curPosition.y, 200 - curPosition.y, 'Y');
-    endInputLine(num);
+    let num = custom ? customTransforms.length : transforms.length;
 
-    transforms.unshift(['T', 0, 0]);
-    updateTransforms();
+    startInputLine('T', num, custom);
+    setupInput(num + '-1', minX, maxX, 1, 'X', custom);
+    setupInput(num + '-2', minY, maxY, 1, 'Y', custom);
+    endInputLine(num, custom);
+
+    if(custom) { customTransforms.unshift(['T', 0, 0]); }
+    else { transforms.unshift(['T', 0, 0]); }
+    updateTransforms(custom);
 }
 
-function addRotation() {
-    let num = transforms.length;
+function addRotation(custom = false) {
+    let num = custom ? customTransforms.length : transforms.length;
 
-    startInputLine('R', num);
-    setupInput(num + '-1', 0, 360, 'Angle (degrees)');
-    endInputLine(num);
+    startInputLine('R', num, custom);
+    setupInput(num + '-1', 0, 360, 1, 'Angle (degrees)', custom);
+    endInputLine(num, custom);
 
-    transforms.unshift(['R', 0]);
-    updateTransforms();
+    if(custom) { customTransforms.unshift(['R', 0]); }
+    else { transforms.unshift(['R', 0]); }
+    updateTransforms(custom);
 }
 
-function addScaling() {
-    let num = transforms.length;
+function addScaling(custom = false) {
+    let num = custom ? customTransforms.length : transforms.length;
 
-    startInputLine('S', num);
-    setupInput(num + '-1', -3, 3, 'X');
-    setupInput(num + '-2', -3, 3, 'Y');
-    endInputLine(num);
-
-    transforms.unshift(['S', 1, 1]);
-    updateTransforms();
+    startInputLine('S', num, custom);
+    setupInput(num + '-1', -3, 3, 0.5, 'X', custom);
+    setupInput(num + '-2', -3, 3, 0.5, 'Y', custom);
+    endInputLine(num, custom);
+    
+    if(custom) { customTransforms.unshift(['S', 1, 1]); }
+    else { transforms.unshift(['S', 1, 1]); }
+    updateTransforms(custom);
 }
 
-function updateTransforms() {
+function updateTransforms(custom = false) {
+    let curTransforms = custom ? customTransforms : transforms;
     let str = "";
-    transforms.forEach(transform => {
+    curTransforms.forEach(transform => {
         if(transform[0] != "X") {
             str += transform[0] + "(" + transform[1];
             if(transform.length == 3) { str += ", " + transform[2]; }
@@ -209,7 +241,8 @@ function updateTransforms() {
         }
     });
 
-    let sequence = document.getElementById('sequence');
+    let sequence = custom ? document.getElementById('custom-sequence') :
+        document.getElementById('sequence');
     if(str == "") { sequence.innerHTML = "None!"; }
     else { sequence.innerHTML = str + "HOUSE"; }
 }
@@ -221,6 +254,9 @@ function changeLevel() {
     deleteAllInputs();
     transforms = [];
     updateTransforms();
+
+    // Update level label
+    document.getElementById('level-label').innerHTML = 'Level ' + level;
 
     if(level == 1) { level1(); }
     else if(level == 2) { level2(); }
@@ -354,4 +390,68 @@ function transformHouse(house, target) {
 
     // Draw a star if the transformed house lines up with the target
     if(mainPos.approxEqualTo(targetPos)) { star(); }
+}
+
+// Functionality for adding and/or loading saved custom levels
+
+function toggleCustomPlay() {
+    let elements = [];
+    elements.push(document.getElementById('prev-button'));
+    elements.push(document.getElementById('level-label'));
+    elements.push(document.getElementById('next-button'));
+
+    if(document.getElementById('saved-levels-checkbox').checked) {
+        elements.forEach(element => { element.style.visibility = 'hidden'; });
+
+        deleteAllInputs();
+        transforms = [];
+
+        document.getElementById('load-levels-button').removeAttribute('disabled');
+        document.getElementById('level-select').removeAttribute('disabled');
+    } else {
+        elements.forEach(element => { element.style.visibility = 'visible'; });
+
+        level = 1;
+        changeLevel();
+
+        document.getElementById('load-levels-button').setAttribute('disabled', '');
+        document.getElementById('level-select').setAttribute('disabled', '');
+    }
+}
+
+function loadSavedLevels() {
+    let savedLevels = JSON.parse(window.localStorage.getItem('saved-levels'));
+    let selectionMenu = document.getElementById('level-select');
+    selectionMenu.innerHTML = '<option value="">Select one...</option>';
+    savedLevels.forEach(level => {
+        selectionMenu.innerHTML +=
+            '<option value="' + level + '">' + level + '</option>';
+    });
+}
+
+function selectCustomLevel() {
+    // Clear out previous inputs, if any
+    deleteAllInputs();
+    transforms = [];
+
+    // Load the selected level and set up the initial transforms
+    let level = document.getElementById('level-select').value;
+    if(level !== "") {
+        targetTransforms = JSON.parse(window.localStorage.getItem(level));
+        transformHouse(transforms, targetTransforms);
+    }
+}
+
+function saveCustomLevel() {
+    // Save level into local storage and add to list of levels
+    let name = document.getElementById('custom-level-name').value;
+    window.localStorage.setItem(name, JSON.stringify(customTransforms));
+    let savedLevels = JSON.parse(window.localStorage.getItem('saved-levels'));
+    if(!savedLevels.includes(name)) { savedLevels.push(name); }
+    window.localStorage.setItem('saved-levels', JSON.stringify(savedLevels));
+    
+    // Clear out all data entered
+    document.getElementById('custom-level-name').value = '';
+    deleteAllInputs(true);
+    customTransforms = [];
 }
