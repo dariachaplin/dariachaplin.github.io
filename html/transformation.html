@@ -35,15 +35,17 @@
           <p>This tool is based on 
             <a href="http://cs.brown.edu/exploratory/freeSoftware/repository/edu/brown/cs/exploratories/applets/transformationGame/transformation_game_guide.html">
               Brown University's Transformation Game</a>, an applet created to demonstrate how 2D transformations are 
-              chained together.
-          </p>
-          <p>
-            The goal is to line up the house at the origin with the grayscale target house by using basic transformations: 
-            translating, rotating, and scaling. 
-          </p>
-          <p>
-            TODO - specific info about the user experience
-          </p>
+              chained together.</p>
+          <p>The goal is to line up the house at the origin with the grayscale target house by using basic transformations: 
+            translating, rotating, and scaling.</p>
+          <p>Below, you'll see the current sequence of transforms displayed and some buttons to add new ones. Keep in mind how 
+            operations are applied: if you want to rotate and then translate a point, you'll need to multiply the translation 
+            matrix by the rotation matrix by the point's coordinates.</p>
+          <p>Each time you select a button to add a transform, it will be placed on the leftmost side of the multiplication 
+            sequence, and it will also appear at the bottom of the input rows. You can delete a transform by clicking the "X" 
+            button on its input row.</p>
+          <p>Modify the transforms and their values until your house matches up with the goal and a star appears. Try the later 
+            levels for more of a challenge!</p>
           <br>
           <h3>Current Sequence of Transforms</h3>
           <p id="sequence"></p>
