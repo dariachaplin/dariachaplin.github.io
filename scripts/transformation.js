@@ -188,10 +188,10 @@ function updateValue(num, custom = false) {
 
 function addTranslation(custom = false) {
     // Use current position to clamp X/Y values to the canvas
-    let minX = -200 + curPosition.x;
-    let maxX = 200 - curPosition.x;
-    let minY = -200 + curPosition.y;
-    let maxY = 200 - curPosition.y;
+    let minX = Math.round(-200 + curPosition.x);
+    let maxX = Math.round(200 - curPosition.x);
+    let minY = Math.round(-200 + curPosition.y);
+    let maxY = Math.round(200 - curPosition.y);
 
     let num = custom ? customTransforms.length : transforms.length;
 
