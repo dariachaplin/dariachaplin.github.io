@@ -333,8 +333,11 @@ function updateMatrix() {
     let vals = [mat00, mat01, mat02, mat10, mat11, mat12, mat20, mat21, mat22];
     if(inputIsNaNorWrong(vals, 'matrix')) { return; }
 
-    // Update the matrix, refresh the custom color space's values based on current RGB
+    // Update the matrix (and correspondingly the inverse matrix)
     custom.mat = [[mat00, mat01, mat02], [mat10, mat11, mat12], [mat20, mat21, mat22]];
+    custom.matInv = math.inv(custom.mat);
+
+    // Refresh the custom color space's values based on current RGB
     custom.fromRGB(rgb.r, rgb.g, rgb.b);
     customSliderUpdate();
 }

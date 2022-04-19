@@ -175,12 +175,15 @@ function deleteAllInputs(custom = false) {
 
 function updateValue(num, custom = false) {
     let newVal = document.getElementById('val-' + String(num)).value;
+    let row = num.split("-")[0];
+    let inputBox = num.split("-")[1];
+
     if(custom) {
-        customTransforms[customTransforms.length - 1 - num[0]][num[2]] 
+        customTransforms[customTransforms.length - 1 - row][inputBox] 
             = parseFloat(newVal);
         updateTransforms(custom);
     } else {
-        transforms[transforms.length - 1 - num[0]][num[2]] 
+        transforms[transforms.length - 1 - row][inputBox] 
             = parseFloat(newVal);
         transformHouse(transforms, targetTransforms);
     }
