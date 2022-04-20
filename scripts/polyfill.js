@@ -51,9 +51,9 @@ function setup() {
     document.getElementById('Instructions').style.display = "block";
 
     // Custom shape, simple for this algo
-    b1 = createButton('Shape 1');
-    b1.position(10, 487);
-    b1.mousePressed(async () => {
+    let shape1Button = createButton('Shape 1');
+    shape1Button.position(10, 487);
+    shape1Button.mousePressed(async () => {
         vtxs = [new Vertex(10, 10), new Vertex(15, 5), new Vertex(30, 20),
             new Vertex(30, 35), new Vertex(15, 20), new Vertex(10, 25)];
         clear();
@@ -64,9 +64,9 @@ function setup() {
     });
 
     // 4-pointed star
-    b2 = createButton('Shape 2');
-    b2.position(85, 487);
-    b2.mousePressed(async () => {
+    let shape2Button = createButton('Shape 2');
+    shape2Button.position(85, 487);
+    shape2Button.mousePressed(async () => {
         vtxs = [new Vertex(10, 10), new Vertex(20, 15), new Vertex(30, 10),
             new Vertex(25, 20), new Vertex(30, 30), new Vertex(20, 25),
             new Vertex(10, 30), new Vertex(15, 20)];
@@ -78,9 +78,9 @@ function setup() {
     });
 
     // Star shape
-    b3 = createButton('Shape 3');
-    b3.position(160, 487);
-    b3.mousePressed(async () => {
+    let shape3Button = createButton('Shape 3');
+    shape3Button.position(160, 487);
+    shape3Button.mousePressed(async () => {
         vtxs = [new Vertex(10, 3), new Vertex(20, 10), new Vertex(30, 3),
             new Vertex(26, 15), new Vertex(36, 23), new Vertex(24, 23),
             new Vertex(20, 36), new Vertex(16, 23), new Vertex(3, 23),
@@ -93,9 +93,9 @@ function setup() {
     });
 
     // Custom shape
-    b0 = createButton('Custom Shape');
-    b0.position(235, 487);
-    b0.mousePressed(async () => {
+    let customShapeButton = createButton('Custom Shape');
+    customShapeButton.position(235, 487);
+    customShapeButton.mousePressed(async () => {
         vtxs = customVtxs;
         clear();
         drawGrid();
@@ -108,39 +108,39 @@ function setup() {
     // Always check if the previous button has been selected
     //      in order to enforce the order of flow
 
-    b4 = createButton('Increment Scan Line');
-    b4.position(10, 520);
-    b4.mousePressed(() => {
-        if(sortAT) { incScanLine = true; }
-    });
-    
-    b5 = createButton('Update X');
-    b5.position(10, 544);
-    b5.mousePressed(() => {
-        if(incScanLine) { updateXvals = true; }
-    });
-
-    b6 = createButton('Remove Edges');
-    b6.position(85, 544);
-    b6.mousePressed(() => {
+    let removeEdgesButton = createButton('Remove Edges');
+    removeEdgesButton.position(10, 520);
+    removeEdgesButton.mousePressed(() => {
         clearAT = true;
     });
 
-    b7 = createButton('Add Edges');
-    b7.position(195, 544);
-    b7.mousePressed(() => {
+    let addEdgesButton = createButton('Add Edges');
+    addEdgesButton.position(120, 520);
+    addEdgesButton.mousePressed(() => {
         if(clearAT) { updateAT = true; }
     });
 
-    b8 = createButton('Reorder');
-    b8.position(279, 544);
-    b8.mousePressed(() => {
+    let reorderALButton = createButton('Reorder Active List');
+    reorderALButton.position(205, 520);
+    reorderALButton.mousePressed(() => {
         if(updateAT) { sortAT = true; }
     });
 
-    b9 = createButton('Complete Shape');
-    b9.position(10, 577);
-    b9.mousePressed(() => {
+    let incrementScanLineButton = createButton('Increment Scan Line');
+    incrementScanLineButton.position(10, 544);
+    incrementScanLineButton.mousePressed(() => {
+        if(sortAT) { incScanLine = true; }
+    });
+    
+    let updateXValuesButton = createButton('Update X Values');
+    updateXValuesButton.position(150, 544);
+    updateXValuesButton.mousePressed(() => {
+        if(incScanLine) { updateXvals = true; }
+    });
+
+    let completeShapeButton = createButton('Complete Shape');
+    completeShapeButton.position(10, 577);
+    completeShapeButton.mousePressed(() => {
         autoplayShape = true;
         clearAT = true;
         updateAT = true;
@@ -271,6 +271,13 @@ function updateEdgeTable(edgeTable) {
     }
 }
 
+// Post the updated Scan Line y-value to the 'Data Structures' tab
+function updateScanLine(y) {
+    let element = document.getElementById('Current Scan Line');
+    if(y == -1) { element.innerHTML = ""; }
+    else { element.innerHTML = "Current Scan Line: " + y; }
+}
+
 async function polyfill(v) {
     // Set up edge table and active list
     let edgeTable = createEdgeTable(v);
@@ -296,6 +303,7 @@ async function polyfill(v) {
     }
     
     let y = (lowerY >= -1) ? lowerY : 0;
+    updateScanLine(y);
 
     // Iterate through the lowest to highest relevant scan lines
     while(y <= upperY) {
@@ -344,6 +352,7 @@ async function polyfill(v) {
         if(autoplayShape) { await sleep(autoplaySpeed); }
         while(!incScanLine) { await sleep(300); }
         y++;
+        updateScanLine(y);
         while(!updateXvals) { await sleep(300); }
         for(let i = 0; i < activeList.length; i++) {
             // Can skip over vertical edges
@@ -359,6 +368,9 @@ async function polyfill(v) {
                 incScanLine = false, updateXvals = false;
         }
     }
+
+    // Clear out scan line display on 'Data Structures' tab
+    updateScanLine(-1);
 }
 
 // Functionality for adding your own shape

@@ -70,12 +70,16 @@
           <p>
             On this tab, you can input your own matrix to set up a custom color space. As a default, 
             the custom matrix is set up to simulate the RGB color space, just with a numerical range of 0 to 1 
-            rather than 0 to 255. Check the option below to get started on your own.
+            rather than 0 to 255. Check the option below to get started on your own - another row of sliders 
+            will appear for Values 1, 2, and 3, which correspond to the component values of the custom color 
+            space.
           </p>
           <input type="checkbox" id="display-custom" onchange="customSpaceVisibilityChange()">
           <label for="display-custom">Display Custom Color Space</label>
           <p>
-            Edit the matrix used to convert from RGB to your color space below:
+            Edit the matrix used to convert from RGB to your color space below. This matrix will be multiplied 
+            by the current RGB values (which are stored on a range of 0 to 1) to calculate the resulting 
+            components of your color space.
           </p>
           <div>
             <div class="matrix-row">
@@ -100,7 +104,10 @@
             <p style="display: inline; color: red;" id="matrix-error-msg"></p>
           </div>
           <p>
-            Then, set the range that each value can have:
+            Then, set the range that each value can have. This will just set up the sliders with the possible 
+            range of values for the three components of your color space (the ranges have no impact on how the 
+            conversion is calculated). For example, the RGB color space generally has its components 
+            range from 0 to 255.
           </p>
           <div>
             <div class="matrix-row">
@@ -128,9 +135,10 @@
             <p style="display: inline; color: red;" id="ranges-error-msg"></p>
           </div>
           <p>
-            Note that it is important to have a range that correctly matches up with the provided matrix. If it is too 
+            Note that there may be odd results if the range does not match up with the provided matrix. If it is too 
             narrow, the custom color space values may be clamped incorrectly when other spaces' values are changed. If 
             it is too broad, other color spaces' values may be clamped when the custom color space's values are changed.
+            So, if you're unsure of the exact range, experiment with some values until minimal clamping seems to occur.
           </p>
         </div>
         <div id="Resources" class="tabcontent">

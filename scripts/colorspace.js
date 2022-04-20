@@ -340,6 +340,10 @@ function updateMatrix() {
     // Refresh the custom color space's values based on current RGB
     custom.fromRGB(rgb.r, rgb.g, rgb.b);
     customSliderUpdate();
+
+    // Display the custom color space automatically upon an update to it
+    document.getElementById('display-custom').checked = true;
+    showCustomSpace();
 }
 
 function updateRanges() {
@@ -386,8 +390,9 @@ function updateRanges() {
     custom.fromRGB(rgb.r, rgb.g, rgb.b);
     customSliderUpdate();
 
-    // Hide the new sliders and labels if they were previously hidden
-    if(!customSpaceDisplayed) { hideCustomSpace(); }
+    // Display the custom color space automatically upon an update to it
+    document.getElementById('display-custom').checked = true;
+    showCustomSpace();
 }
 
 function getCustomSpaceLabels() {

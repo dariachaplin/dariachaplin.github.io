@@ -43,18 +43,19 @@
             Active List.</p>
           <p>In order to control the flow of events, utilize the set of buttons underneath the canvas. 
             These allow you to step through the code, updating data structures and filling in each scan 
-            line in the shape. Note that the second row of buttons all pertain to making updates to the 
-            Active List.</p>
+            line in the shape.</p>
+          <p>Note that the buttons are laid out in order of the algorithm's flow: 'Remove Edges', 'Add 
+            Edges', 'Reorder Active List', 'Increment Scan Line', and 'Update X Values'. Each button must 
+            be pressed every round, even if no updates will be made.</p>
           <p>The 'Complete Shape' button will move through the algorithm automatically, pausing briefly 
             between each step to show the updates. Use the 'Speed' slider to control how fast the shape 
             gets filled.</p>
-          <p>When switching between shapes, ensure that your current shape is finished drawing (the Edge 
-            Table and Active List will both be empty). If you run into any issues when switching shapes, 
-            refresh the page and try again.</p>
-          <p>Hints: The flow of buttons is 'Remove Edges', 'Add Edges', 'Reorder', 'Increment Scan Line', 
-            and then 'Update X'. Each button must be pressed every round, even if no updates will be made.</p>
+          <p>Warning: When switching between shapes, ensure that your current shape is finished drawing 
+            (when it's done, the Edge Table and Active List will both be empty). If you run into any 
+            issues when switching shapes, refresh the page and try again.</p>
         </div>
         <div id="Data Structures" class="tabcontent">
+          <h3 id="Current Scan Line"></h3>
           <h3>Edge Table</h3>
           <p id="Edge Table"></p>
           <h3>Active List</h3>
@@ -108,9 +109,11 @@
           <div style="clear: both;">&nbsp;</div>
           <button type="button" onclick="updateVtxs()">Update Vertices</button>
           <p style="display: inline; color: red;" id="vtxs-error-msg"></p>
-          <p>Use the 'Preview Shape' button to ensure that the vertices you entered 
-            match your intended shape. This will only work if you successfully 
-            updated the custom vertices and have no error messages.</p>
+          <p>Finally, use the 'Preview Shape' button to ensure that the vertices 
+            you entered match your intended shape. This will only work if you 
+            successfully updated the custom vertices and have no error messages.
+            If it looks correct, click 'Custom Shape' from the shape selection 
+            buttons to try out the algorithm!</p>
           <button type="button" onclick="previewCustomShape()">Preview Shape</button>
         </div>
         <div id="Resources" class="tabcontent">
